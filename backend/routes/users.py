@@ -17,3 +17,8 @@ def get_user_by_id(userId: int):
 @auth.require_auth(admin_only=True)
 def get_users():
     return user_controller.get_users()
+
+@bp.put("/<int:userId>")
+@auth.require_auth()
+def update_user(userId: int):
+    return user_controller.update_user(userId)
