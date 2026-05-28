@@ -3,7 +3,7 @@ from flask import g, jsonify, request
 from services import auth_service
 from models.enums import UserRole
 
-def auth(admin_only: bool):
+def require_auth(admin_only: bool = False):
     def decorator(view_func):
         @wraps(view_func)
         def wrapped(*args, **kwargs):
