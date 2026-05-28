@@ -12,3 +12,8 @@ def create_user():
 @auth.require_auth()
 def get_user_by_id(userId: int):
     return user_controller.get_user_by_id(userId)
+
+@bp.get("/")
+@auth.require_auth(admin_only=True)
+def get_users():
+    return user_controller.get_users()

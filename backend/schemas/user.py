@@ -6,12 +6,19 @@ class CreateUserSchema(BaseModel):
     name: str
     email: EmailStr
     role: UserRole = UserRole.STUDENT
+    password: str
 
     @field_validator("email")
     @classmethod
     def must_be_dartmouth_email(cls, v):
         if not v.endswith("@dartmouth.edu"):
             raise ValueError("Must be a Dartmouth email address")
+        return v
+    @field_validator("password")
+    @classmethod
+    def validate_pw(cls, v):
+        if len(v) == 0:
+            raise ValueError("Must be non-empty password")
         return v
 
 class UpdateUserSchema(BaseModel):

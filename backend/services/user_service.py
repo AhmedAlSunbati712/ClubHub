@@ -1,16 +1,17 @@
 from config import get_connection
+from .auth_service import hash_password
 
-def create_user(name, email, role):
+def create_user(name, email, role, password):
     """
     Description: Create a user given their name, email and role
     """
-    
+    hashed_password = hash_password(password)
     connection = get_connection()
     cursor = connection.cursor()
     try:
         cursor.execute(
-            "INSERT INTO Users (Name, Email, Role) VALUES (%s, %s, %s)",
-            [name, email, role]
+            "INSERT INTO Users (Name, Email, Role, HashedPassword) VALUES (%s, %s, %s, %s)",
+            [name, email, role, hashed_password]
         )
         connection.commit()
         return cursor.lastrowid
@@ -29,7 +30,7 @@ def get_user_by_id(userId):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True) # dictionary = True to return a dictionary instead of a tuple
     try:
-        cursor.execute("SELECT * FROM Users WHERE UserID = %s", [userId])
+        cursor.execute("SELECT UserID, Name, Email, Role FROM Users WHERE UserID = %s", [userId])
         return cursor.fetchone()
     except Exception as e:
         raise e
@@ -45,7 +46,7 @@ def get_users(userId=None, name=None, email=None, userRole=None):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
-        query = "SELECT * FROM Users WHERE 1=1"
+        query = "SELECT UserID, Name, Email, Role FROM Users WHERE 1=1"
         params = []
 
         if userId:

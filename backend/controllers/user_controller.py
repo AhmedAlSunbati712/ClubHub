@@ -11,7 +11,7 @@ def create_user():
         return jsonify({"errors": e.errors()}), 422
     body.role = UserRole.STUDENT # making sure that role for a newly created user is always a student
     try:
-        userId = user_service.create_user(body.name, body.email, body.role)
+        userId = user_service.create_user(body.name, body.email, body.role, body.password)
         user = {"userId": userId, "name": body.name, "email": body.email, "role": body.role}
         return jsonify(user), 201
     except Exception as e:
@@ -30,3 +30,15 @@ def get_user_by_id(userId: int):
         return jsonify(user), 200
     except Exception as e:
         return jsonify({"Error": f"Failed to get user with id {userId}: {e}"}), 500
+
+def get_users():
+    user_id = request.args.get("id", type=int)
+    role = request.args.get("role")
+    name = request.args.get("name")
+    email = request.args.get("email")
+
+    try:
+        users = user_service.get_users(userId=user_id, name=name, email=email, userRole=role)
+        return jsonify(users), 200
+    except Exception as e:
+        return jsonify({"Error": f"Failed to get users: {e}"}), 500
