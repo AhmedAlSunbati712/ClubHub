@@ -19,7 +19,7 @@ def auth(admin_only: bool):
             except Exception:
                 return jsonify({"Error": "Invalid or expired token"})
             
-            if admin_only and not (payload.get["Role"] == UserRole.ADMIN):
+            if admin_only and not (payload.get["role"] == UserRole.ADMIN):
                 return jsonify({"Error": "Admin access required for this action"}), 403
             
             g.current_user = payload
