@@ -17,9 +17,9 @@ def require_auth(admin_only: bool = False):
             try:
                 payload = auth_service.decode_token(token)
             except Exception:
-                return jsonify({"Error": "Invalid or expired token"})
+                return jsonify({"Error": "Invalid or expired token"}), 401
             
-            if admin_only and not (payload.get["role"] == UserRole.ADMIN):
+            if admin_only and payload.get("role") != UserRole.ADMIN:
                 return jsonify({"Error": "Admin access required for this action"}), 403
             
             g.current_user = payload

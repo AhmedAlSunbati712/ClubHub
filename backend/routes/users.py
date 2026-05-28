@@ -1,8 +1,14 @@
 from flask import Blueprint
 from controllers import user_controller
+from middleware import auth
 
 bp = Blueprint("users", __name__, url_prefix="/api/users")
 
 @bp.post("/")
 def create_user():
     return user_controller.create_user()
+
+@bp.get("/<int:userId>")
+@auth.require_auth()
+def get_user_by_id(userId: int):
+    return user_controller.get_user_by_id(userId)

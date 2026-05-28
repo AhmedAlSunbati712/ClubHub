@@ -11,14 +11,14 @@ def hash_password(plaintext_password):
     return hashed_password.decode("utf-8")
 
 def verify_password(plaintext_pw, plaintext_hashed_pw):
-    pw_bytes = plaintext_hashed_pw.encode("utf-8")
+    pw_bytes = plaintext_pw.encode("utf-8")
     hashed_pw_bytes = plaintext_hashed_pw.encode("utf-8")
     return bcrypt.checkpw(pw_bytes, hashed_pw_bytes)
 
 def create_token(user):
     now = datetime.now(timezone.utc)
     payload = {
-        "sub": user["userID"],
+        "sub": user["UserID"],
         "role": user["Role"],
         "iat": now,
         "exp": now + timedelta(hours=ENV.JWT_EXPIRY_HOURS)
@@ -27,4 +27,4 @@ def create_token(user):
 
 
 def decode_token(token):
-    return jwt.decode(token, ENV.JWT_SECRET, algorithm=["HS256"])
+    return jwt.decode(token, ENV.JWT_SECRET, algorithms=["HS256"])

@@ -1,10 +1,11 @@
 import mysql.connector
-from env import ENV
+from .env import ENV
 
 def get_connection():
     return mysql.connector.connect(
         host=ENV.DB_HOST,
         port=ENV.DB_PORT,
         user=ENV.DB_USER,
-        password=ENV.DB_PASSWORD
+        password=ENV.DB_PASSWORD,
+        database=ENV.DB_NAME,
     )
