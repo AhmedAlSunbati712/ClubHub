@@ -70,12 +70,12 @@ def get_users(userId=None, name=None, email=None, userRole=None):
         cursor.close()
         connection.close()
 
-def update_user(userId, name=None, email=None, role=None):
+def update_user(userId, name=None, email=None, role=None, password=None):
     """
     Description: Update a set of field for a user given their id.
     """
     
-    if not name and not email and not role:
+    if not name and not email and not role and not password:
         return None
 
     connection = get_connection()
@@ -93,6 +93,9 @@ def update_user(userId, name=None, email=None, role=None):
         if role:
             fields.append("Role = %s")
             params.append(role)
+        if password:
+            fields.append("HashedPassword = %s")
+            params.append(hash_password(password))
 
         params.append(userId)
         cursor.execute(f"UPDATE Users SET {', '.join(fields)} WHERE UserID = %s", params)

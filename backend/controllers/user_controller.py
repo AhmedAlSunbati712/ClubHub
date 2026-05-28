@@ -42,3 +42,32 @@ def get_users():
         return jsonify(users), 200
     except Exception as e:
         return jsonify({"Error": f"Failed to get users: {e}"}), 500
+
+
+def update_user(userId: int):
+    current_user = g.current_user
+    if current_user.get("sub") != userId and  current_user.get("role") != UserRole.ADMIN:
+        return jsonify({"Error": "Action is not authorized"}), 403
+    try:
+        body = UpdateUserSchema(**request.get_json())
+    except ValidationError as e:
+        return jsonify({"errors": e.errors()}), 422
+
+    if body.role is not None and current_user.get("role") != UserRole.ADMIN:
+        return jsonify({"Error": "Only admins can update user roles"}), 403
+
+    try:
+        rowcount = user_service.update_user(
+            userId,
+            name=body.name,
+            email=body.email,
+            role=body.role,
+            password=body.password,
+        )
+        if rowcount is None:
+            return jsonify({"Error": "No fields provided to update"}), 400
+        if rowcount == 0:
+            return jsonify({"Error": f"User with id {userId} not found"}), 404
+        return jsonify({"message": "Success"}), 200
+    except Exception as e:
+        return jsonify({"Error": f"Failed to get update user {userId}: {e}"}), 500
