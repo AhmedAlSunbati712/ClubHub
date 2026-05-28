@@ -22,3 +22,9 @@ def get_users():
 @auth.require_auth()
 def update_user(userId: int):
     return user_controller.update_user(userId)
+
+
+@bp.delete("/<int:userId>")
+@auth.require_auth()
+def delete_user(userId: int):
+    return user_controller.delete_user(userId)

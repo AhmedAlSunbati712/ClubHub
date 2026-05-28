@@ -71,3 +71,16 @@ def update_user(userId: int):
         return jsonify({"message": "Success"}), 200
     except Exception as e:
         return jsonify({"Error": f"Failed to get update user {userId}: {e}"}), 500
+
+
+def delete_user(userId: int):
+    current_user = g.current_user
+    if current_user.get("sub") != userId and current_user.get("role") != UserRole.ADMIN:
+        return jsonify({"Error": "Action is not Authorized"}), 403
+    try:
+        rowcount = user_service.delete_user(userId)
+        if rowcount == 0:
+            return jsonify({"Error": f"User with id {userId} not found"}), 404
+        return jsonify({"message": "Success"}), 200
+    except Exception as e:
+        return jsonify({"Error": f"Failed to delete user {userId}: {e}"}), 500

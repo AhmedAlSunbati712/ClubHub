@@ -115,6 +115,7 @@ def delete_user(userId):
     
     connection = get_connection()
     cursor = connection.cursor()
+    # TODO: We need to enforce the business rule here that a user account can't be deleted if they are the sole office of a club
     try:
         cursor.execute("DELETE FROM Users WHERE UserID = %s", [userId])
         connection.commit()
