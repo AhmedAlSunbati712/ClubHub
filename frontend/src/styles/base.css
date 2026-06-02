@@ -1,0 +1,255 @@
+/* ============================================================
+   Reset + base typography
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-base);
+  color: var(--text);
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(60rem 40rem at 100% -10%, rgba(0, 105, 62, 0.05), transparent 60%),
+    radial-gradient(50rem 36rem at -10% 0%, rgba(14, 58, 92, 0.04), transparent 55%);
+  background-attachment: fixed;
+  font-feature-settings: 'cv01', 'cv03', 'cv04', 'ss03';
+  font-variant-ligatures: common-ligatures contextual;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+a {
+  color: var(--dart-green);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--dart-green-hover);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: var(--lh-snug);
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+/* Visible, consistent keyboard focus */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+  border-radius: var(--r-sm);
+}
+
+::selection {
+  background: var(--green-100);
+}
+
+/* ---- App shell layout ---- */
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-main {
+  flex: 1 0 auto;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin-inline: auto;
+  padding-inline: var(--space-6);
+}
+
+.page {
+  padding-block: var(--space-10) var(--space-16);
+}
+
+/* ---- Page header pattern ---- */
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.page-head__titles {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.page-title {
+  font-size: var(--fs-display);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: var(--lh-tight);
+  text-wrap: balance;
+  color: var(--forest);
+}
+
+.page-subtitle {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  max-width: 60ch;
+}
+
+.page-head__back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.back-btn {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--r-pill);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.back-btn:hover {
+  background: var(--green-50);
+  color: var(--dart-green);
+  border-color: var(--green-200);
+}
+
+/* ---- Generic helpers ---- */
+.section-title {
+  font-size: var(--fs-h2);
+  font-weight: 650;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+.empty-state {
+  color: var(--muted);
+  font-size: var(--fs-sm);
+  padding: var(--space-6) 0;
+}
+
+@media (max-width: 768px) {
+  .container {
+    padding-inline: var(--space-4);
+  }
+  .page {
+    padding-block: var(--space-8) var(--space-12);
+  }
+  .page-head {
+    flex-direction: column;
+  }
+}
+
+/* ---- Entrance motion ---- */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.page-head,
+.search-bar,
+.card-grid > *,
+.club-hero,
+.dash-tiles > *,
+.dash-grid > *,
+.profile__grid > *,
+.club-detail__grid > *,
+.table-wrap,
+.loc-cards > * {
+  animation: fade-up 0.5s var(--ease-out) both;
+}
+
+.page-head {
+  animation-delay: 0.02s;
+}
+.search-bar {
+  animation-delay: 0.06s;
+}
+
+/* staggered grids */
+.card-grid > *:nth-child(1),
+.dash-tiles > *:nth-child(1),
+.loc-cards > *:nth-child(1) {
+  animation-delay: 0.08s;
+}
+.card-grid > *:nth-child(2),
+.dash-tiles > *:nth-child(2),
+.loc-cards > *:nth-child(2) {
+  animation-delay: 0.13s;
+}
+.card-grid > *:nth-child(3),
+.dash-tiles > *:nth-child(3),
+.loc-cards > *:nth-child(3) {
+  animation-delay: 0.18s;
+}
+.card-grid > *:nth-child(4),
+.dash-tiles > *:nth-child(4),
+.loc-cards > *:nth-child(4) {
+  animation-delay: 0.23s;
+}
+.card-grid > *:nth-child(n + 5) {
+  animation-delay: 0.28s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

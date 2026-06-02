@@ -1,0 +1,103 @@
+/* ============================================================
+   DartClubs design tokens — Dartmouth Green system
+   ============================================================ */
+:root {
+  /* ---- Brand ---- */
+  --dart-green: #00693e;        /* Dartmouth Green — primary */
+  --dart-green-hover: #0a5535;
+  --dart-green-press: #07432a;
+  --forest: #12312b;            /* deep forest — hero/text on light */
+  --green-50: #e7f2ec;
+  --green-100: #d4e9dd;
+  --green-200: #b8dcc8;
+
+  --navy: #0e3a5c;              /* River navy — accent / President / links */
+  --navy-50: #e6eef4;
+
+  /* ---- Status (accessible on their tints) ---- */
+  --success: #1b7a43;
+  --success-bg: #e4f3ea;
+  --warning: #a15c00;
+  --warning-bg: #fbf0db;
+  --danger: #9d162e;
+  --danger-bg: #fbe7ea;
+
+  /* ---- Neutrals ---- */
+  --bg: #f6f7f6;
+  --surface: #ffffff;
+  --surface-2: #fbfcfb;
+  --border: #e5e8e5;
+  --hairline: #eef0ee;
+  --text: #181b18;
+  --text-secondary: #5a615b;
+  --muted: #8c938d;
+  --on-dark: #ffffff;
+  --on-dark-dim: rgba(255, 255, 255, 0.78);
+
+  /* ---- Typography ---- */
+  --font-sans: 'Geist Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Geist Mono Variable', ui-monospace, 'SF Mono', Menlo, monospace;
+
+  --fs-display: clamp(2rem, 1.4rem + 2.6vw, 2.85rem);
+  --fs-h1: clamp(1.6rem, 1.3rem + 1.2vw, 2rem);
+  --fs-h2: 1.4rem;
+  --fs-h3: 1.075rem;
+  --fs-body: 0.95rem;
+  --fs-sm: 0.85rem;
+  --fs-xs: 0.75rem;
+
+  --lh-tight: 1.1;
+  --lh-snug: 1.3;
+  --lh-base: 1.55;
+
+  /* ---- Spacing (4px scale) ---- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* ---- Radii ---- */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --r-pill: 999px;
+
+  /* ---- Elevation (soft, layered, green-tinted) ---- */
+  --shadow-xs: 0 1px 2px rgba(18, 49, 43, 0.04);
+  --shadow-sm:
+    0 1px 2px rgba(18, 49, 43, 0.04),
+    0 2px 6px rgba(18, 49, 43, 0.05);
+  --shadow-md:
+    0 2px 4px rgba(18, 49, 43, 0.04),
+    0 8px 20px -4px rgba(18, 49, 43, 0.1);
+  --shadow-lg:
+    0 4px 8px rgba(18, 49, 43, 0.05),
+    0 20px 40px -8px rgba(18, 49, 43, 0.16);
+  --shadow-green:
+    0 2px 6px rgba(0, 105, 62, 0.12),
+    0 12px 28px -6px rgba(0, 105, 62, 0.22);
+  --ring: 0 0 0 3px rgba(0, 105, 62, 0.22);
+
+  /* ---- Accent gradients ---- */
+  --grad-primary: linear-gradient(180deg, #0a7349 0%, var(--dart-green) 100%);
+  --grad-hero: linear-gradient(135deg, #0c2823 0%, var(--forest) 35%, var(--dart-green) 88%, #0a8351 100%);
+  --grad-fill-open: linear-gradient(90deg, #0a7349, #14a06a);
+  --grad-fill-near: linear-gradient(90deg, #b06a09, #d98a1a);
+  --grad-fill-full: linear-gradient(90deg, #8c1428, #c0233f);
+  --grad-text: linear-gradient(140deg, var(--forest) 0%, var(--dart-green) 100%);
+
+  /* ---- Motion ---- */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ---- Layout ---- */
+  --container: 1240px;
+  --nav-h: 68px;
+}
