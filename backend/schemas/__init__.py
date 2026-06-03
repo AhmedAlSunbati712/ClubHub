@@ -1,3 +1,3 @@
 from .user import CreateUserSchema, UpdateUserSchema
-
-# Schemas only for request any request that has a body
+from .event import CreateEventSchema, UpdateEventSchema
+from .rsvp import UpdateRSVPSchema
