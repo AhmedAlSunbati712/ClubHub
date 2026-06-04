@@ -22,10 +22,6 @@ class ClubRole(str, Enum):
     OFFICER = "Officer"
     PRESIDENT = "President"
 
-class ClubStatus(str, Enum):
-    ACTIVE = "Active"
-    INACTIVE = "Inactive"
-
 class MembershipStatus(str, Enum):
     ACTIVE = "Active"
     PENDING = "Pending"
