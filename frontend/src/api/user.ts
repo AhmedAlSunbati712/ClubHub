@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import axios from './axios';
+import api from './axios';
 import { UserRole } from '../types/user';
 
 const USERS_KEY = 'users';
@@ -44,11 +44,11 @@ const normalizeUser = (user: BackendUser) => ({
   role: user.Role ?? user.role ?? UserRole.STUDENT,
 });
 
-export const createUser = (onSuccess?: () => void) => {
+export const useCreateUser = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (userData: CreateUserDTO) => {
-      const response = await axios.post('/api/users/', userData);
+      const response = await api.post('/api/users/', userData);
       return normalizeUser(response.data);
     },
     onSuccess: () => {
@@ -58,21 +58,21 @@ export const createUser = (onSuccess?: () => void) => {
   });
 };
 
-export const getUserById = (userId: string) => {
+export const useUser = (userId: string) => {
   return useQuery({
     queryKey: [USERS_KEY, userId],
     queryFn: async () => {
-      const response = await axios.get(`/api/users/${userId}`);
+      const response = await api.get(`/api/users/${userId}`);
       return normalizeUser(response.data);
     }
   });
 };
 
-export const getUsers = (query?: GetUsersDTO) => {
+export const useUsers = (query?: GetUsersDTO) => {
   return useQuery({
     queryKey: [USERS_KEY, query],
     queryFn: async () => {
-      const response = await axios.get('/api/users/', {
+      const response = await api.get('/api/users/', {
         params: query
       });
       return response.data.map(normalizeUser);
@@ -80,11 +80,11 @@ export const getUsers = (query?: GetUsersDTO) => {
   });
 };
 
-export const updateUser = (onSuccess?: () => void) => {
+export const useUpdateUser = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ userId, updatePayload }: { userId: string, updatePayload: UpdateUserDTO }) => {
-      const response = await axios.put(`/api/users/${userId}`, updatePayload);
+      const response = await api.put(`/api/users/${userId}`, updatePayload);
       return response.data;
     },
     onSuccess: () => {
@@ -94,11 +94,11 @@ export const updateUser = (onSuccess?: () => void) => {
   });
 };
 
-export const deleteUser = (onSuccess?: () => void) => {
+export const useDeleteUser = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (userId: string) => {
-      const response = await axios.delete(`/api/users/${userId}`);
+      const response = await api.delete(`/api/users/${userId}`);
       return response.data;
     },
     onSuccess: () => {
