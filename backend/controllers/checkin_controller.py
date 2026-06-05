@@ -1,5 +1,6 @@
 # Noah Larbalestier, CS61, Spring 2026
 # handles check-in endpoints — officer/admin only
+# used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 from flask import g, jsonify
 from services import event_service, checkin_service
 from models.enums import UserRole, ClubRole

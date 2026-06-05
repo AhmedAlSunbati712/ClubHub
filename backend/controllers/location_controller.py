@@ -1,5 +1,6 @@
 # Josephine Conley, CS61, Spring 2026
 # handles CRUD operations for locations
+# used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 
 from flask import g, request, jsonify
 from pydantic import ValidationError

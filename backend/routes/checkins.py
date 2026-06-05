@@ -1,5 +1,6 @@
 # Noah Larbalestier, CS61, Spring 2026
 # routes for /api/events/:eventId/checkins
+# used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 from flask import Blueprint
 from controllers import checkin_controller
 from middleware import auth

@@ -1,5 +1,6 @@
 # Josephine Conley, CS61, Spring 2026
 # database queries for location creation and lookups, checking to make sure location exists
+# used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 
 from config import get_connection
 

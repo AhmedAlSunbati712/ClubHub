@@ -1,5 +1,6 @@
 # Josephine Conley, CS61, Spring 2026
 # routes for /api/clubs/:clubId/memberships, /api/clubs/:clubId/memberships/:userId, and /api/users/:userId/memberships
+# used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 
 from flask import Blueprint
 from controllers import membership_controller

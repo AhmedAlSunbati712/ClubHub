@@ -1,5 +1,6 @@
 # Noah Larbalestier, CS61, Spring 2026
 # database queries for RSVPs, including waitlist promotion logic
+# used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 from config import get_connection
 from models.enums import RSVPStatus
 

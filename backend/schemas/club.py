@@ -1,5 +1,6 @@
 # Josephine Conley, CS61, Spring 2026
 # request body schemas for club creation and updates
+# used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 
 from pydantic import BaseModel
 from typing import Optional

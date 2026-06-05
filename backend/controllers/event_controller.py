@@ -1,5 +1,6 @@
 # Noah Larbalestier, CS61, Spring 2026
 # handles event CRUD — enforces officer/admin permissions and capacity constraints
+# used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 from flask import g, request, jsonify
 from pydantic import ValidationError
 from schemas import CreateEventSchema, UpdateEventSchema

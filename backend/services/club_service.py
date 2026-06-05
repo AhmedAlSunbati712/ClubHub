@@ -1,5 +1,6 @@
 # Josephine Conley, CS61, Spring 2026
 # database queries for club creation and lookups, checking to make sure club is active/has at least one officer
+# used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 
 from config import get_connection
 from models.enums import ClubRole, MembershipStatus

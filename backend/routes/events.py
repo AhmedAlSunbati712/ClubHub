@@ -1,5 +1,6 @@
 # Noah Larbalestier, CS61, Spring 2026
 # routes for /api/events and /api/clubs/:clubId/events
+# used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 from flask import Blueprint
 from controllers import event_controller
 from middleware import auth

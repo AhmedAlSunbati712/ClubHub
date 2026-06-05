@@ -1,5 +1,6 @@
 # Noah Larbalestier, CS61, Spring 2026
 # request body schemas for event create and update
+# used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
