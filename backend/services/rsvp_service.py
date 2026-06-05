@@ -21,7 +21,7 @@ def create_rsvp(eventId, userId, status):
     cursor = connection.cursor()
     try:
         cursor.execute(
-            "INSERT INTO RSVPs (EventID, UserID, RSVPStatus) VALUES (%s, %s, %s)",
+            "INSERT INTO RSVPs (EventID, UserID, RSVPStatus, RequestedAt) VALUES (%s, %s, %s, NOW())",
             [eventId, userId, status]
         )
         connection.commit()

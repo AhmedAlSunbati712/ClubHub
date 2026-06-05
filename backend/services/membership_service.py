@@ -2,6 +2,7 @@
 # database queries for membership creation and lookups
 
 from config import get_connection
+from models.enums import ClubRole, MembershipStatus
 
 def create_membership(userId, clubId, role, status):
     connection = get_connection()
@@ -79,6 +80,20 @@ def update_membership(userId, clubId, role=None, status=None):
     except Exception as e:
         connection.rollback()
         raise e
+    finally:
+        cursor.close()
+        connection.close()
+
+def club_has_active_officer(clubId):
+    connection = get_connection()
+    cursor = connection.cursor()
+    try:
+        cursor.execute(
+            "SELECT COUNT(*) FROM Memberships WHERE ClubID = %s AND Role IN (%s, %s) AND Status = %s",
+            [clubId, ClubRole.OFFICER, ClubRole.PRESIDENT, MembershipStatus.ACTIVE]
+        )
+        count = cursor.fetchone()[0]
+        return count > 1
     finally:
         cursor.close()
         connection.close()

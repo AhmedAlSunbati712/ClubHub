@@ -31,7 +31,7 @@ def create_club():
 		current_user = g.current_user
 		membership_service.create_membership(
 			userId=current_user["sub"],
-			club_id=club_id,
+			clubId=club_id,
 			role=ClubRole.PRESIDENT,
 			status=MembershipStatus.ACTIVE
 		)
