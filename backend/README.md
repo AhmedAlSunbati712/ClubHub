@@ -25,22 +25,37 @@ backend/
 │   ├── users.py                # /api/users
 │   ├── events.py               # /api/events and /api/clubs/:clubId/events
 │   ├── rsvps.py                # /api/events/:eventId/rsvps
-│   └── checkins.py             # /api/events/:eventId/checkins
+│   ├── checkins.py             # /api/events/:eventId/checkins
+│   ├── auths.py                # /api/auth
+│   ├── clubs.py                # /api/clubs
+│   ├── memberships.py          # /api/clubs/:clubId/memberships and /api/users/:userId/memberships
+│   └── locations.py            # /api/locations
 ├── controllers/
 │   ├── user_controller.py      # request parsing and responses for users
 │   ├── event_controller.py     # request parsing and responses for events
 │   ├── rsvp_controller.py      # RSVP logic including waitlist promotion
-│   └── checkin_controller.py   # check-in logic (officer/admin only)
+│   ├── checkin_controller.py   # check-in logic (officer/admin only)
+│   ├── auth_controller.py      # login and current user
+│   ├── club_controller.py      # club CRUD with officer/admin permissions
+│   ├── membership_controller.py# membership management with role enforcement
+│   └── location_controller.py  # location CRUD (admin only for writes)
 ├── services/
 │   ├── auth_service.py         # password hashing, JWT encode/decode
 │   ├── user_service.py         # SQL queries for users
 │   ├── event_service.py        # SQL queries for events + club role lookups
 │   ├── rsvp_service.py         # SQL queries for RSVPs
-│   └── checkin_service.py      # updates CheckedIn/CheckInTime on the RSVP row
+│   ├── checkin_service.py      # updates CheckedIn/CheckInTime on the RSVP row
+│   ├── club_service.py         # SQL queries for clubs
+│   ├── membership_service.py   # SQL queries for memberships + officer checks
+│   └── location_service.py     # SQL queries for locations + event dependency 
 ├── schemas/
 │   ├── user.py                 # Pydantic models for user requests
 │   ├── event.py                # Pydantic models for event requests
-│   └── rsvp.py                 # Pydantic model for RSVP status update
+│   ├── rsvp.py                 # Pydantic model for RSVP status update
+│   ├── auth.py                 # Pydantic model for login
+│   ├── club.py                 # Pydantic models for club requests
+│   ├── membership.py           # Pydantic model for membership update
+│   └── location.py             # Pydantic models for location requests
 └── middleware/
     └── auth.py                 # @require_auth() decorator
 ```
@@ -128,6 +143,49 @@ When a confirmed RSVP is cancelled or deleted, the oldest waitlisted RSVP (by `R
 | GET    | `/api/events/:eventId/checkins`           | officer / admin | List checked-in attendees |
 
 Check-in data (`CheckedIn`, `CheckInTime`) is stored directly on the RSVP row — there is no separate check-ins table. A user must have a non-cancelled RSVP to be checked in.
+
+### Auth
+
+| Method | Path              | Auth     | Description                                    |
+|--------|-------------------|----------|------------------------------------------------|
+| POST   | `/api/auth/login` | none     | Log in with email and password, return JWT     |
+| GET    | `/api/auth/me`    | any user | Return the currently authenticated user        |
+
+### Clubs
+
+| Method | Path                  | Auth            | Description                                          |
+|--------|-----------------------|-----------------|------------------------------------------------------|
+| POST   | `/api/clubs/`         | any user        | Create a club; creator auto-assigned as President    |
+| GET    | `/api/clubs/:clubId`  | none            | Get one club's details                               |
+| GET    | `/api/clubs/`         | none            | List / search / filter clubs                         |
+| PUT    | `/api/clubs/:clubId`  | officer / admin | Update club metadata                                 |
+| DELETE | `/api/clubs/:clubId`  | officer / admin | Delete a club                                        |
+
+Query params for `GET /api/clubs`: `name`, `category`.
+
+### Memberships
+
+| Method | Path                                         | Auth            | Description                       |
+|--------|----------------------------------------------|-----------------|-----------------------------------|
+| POST   | `/api/clubs/:clubId/memberships`             | any user        | Join or request to join a club    |
+| GET    | `/api/clubs/:clubId/memberships`             | any user        | List members of a club            |
+| GET    | `/api/users/:userId/memberships`             | any user        | List all clubs for a user         |
+| PUT    | `/api/clubs/:clubId/memberships/:userId`     | officer / admin | Change membership status or role  |
+| DELETE | `/api/clubs/:clubId/memberships/:userId`     | officer / admin | Remove a membership               |
+
+A club must always have at least one active Officer or President. Demotion or deletion of the last officer is blocked.
+
+### Locations
+
+| Method | Path                          | Auth       | Description                                          |
+|--------|-------------------------------|------------|------------------------------------------------------|
+| POST   | `/api/locations/`             | admin only | Create a location                                    |
+| GET    | `/api/locations/:locationId`  | none       | Get one location                                     |
+| GET    | `/api/locations/`             | none       | List / search locations                              |
+| PUT    | `/api/locations/:locationId`  | admin only | Update building, room, or capacity                   |
+| DELETE | `/api/locations/:locationId`  | admin only | Delete a location if no events depend on it          |
+
+Query params for `GET /api/locations`: `building`, `room`.
 
 ## Adding a New Resource
 

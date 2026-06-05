@@ -1,8 +1,7 @@
 import bcrypt
-from config import ENV
+from config import ENV, get_connection
 from datetime import datetime, timedelta, timezone
 import jwt
-
 
 def hash_password(plaintext_password):
     password_bytes = plaintext_password.encode("utf-8")
@@ -25,6 +24,25 @@ def create_token(user):
     }
     return jwt.encode(payload, ENV.JWT_SECRET, algorithm="HS256")
 
-
 def decode_token(token):
     return jwt.decode(token, ENV.JWT_SECRET, algorithms=["HS256"])
+
+def get_user_by_email(email):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    try: 
+        cursor.execute("SELECT * FROM Users WHERE Email = %s", [email])
+        return cursor.fetchone()
+    finally:
+        cursor.close()
+        connection.close()
+
+def get_user_by_id(userId):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT * FROM Users WHERE UserID = %s", [userId])
+        return cursor.fetchone()
+    finally:
+        cursor.close()
+        connection.close()
