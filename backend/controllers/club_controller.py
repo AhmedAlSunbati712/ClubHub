@@ -1,3 +1,6 @@
+# Josephine Conley, CS61, Spring 2026
+# handles CRUD operations for clubs
+
 from flask import g, jsonify, request
 from pydantic import ValidationError
 from schemas import CreateClubSchema, UpdateClubSchema
@@ -27,7 +30,7 @@ def create_club():
 		)
 		current_user = g.current_user
 		membership_service.create_membership(
-			user_id=current_user["sub"],
+			userId=current_user["sub"],
 			club_id=club_id,
 			role=ClubRole.PRESIDENT,
 			status=MembershipStatus.ACTIVE

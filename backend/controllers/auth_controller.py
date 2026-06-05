@@ -1,3 +1,6 @@
+# Josephine Conley, CS61, Spring 2026
+# handles CRUD operations for logins
+
 from flask import g, jsonify, request
 from pydantic import ValidationError
 from schemas.auth import LoginSchema

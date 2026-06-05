@@ -1,3 +1,6 @@
+# Josephine Conley, CS61, Spring 2026
+# handles CRUD operations for locations
+
 from flask import g, request, jsonify
 from pydantic import ValidationError
 from schemas import CreateLocationSchema, UpdateLocationSchema
@@ -65,7 +68,7 @@ def delete_location(locationId):
     if not location:
         return jsonify({"Error": f"Location with id {locationId} not found"}), 404
 
-    if location_service.location_has_events(locationId):
+    if location_service.valid_location(locationId):
         return jsonify({"Error": "Cannot delete a location that has events"}), 409
 
     try:

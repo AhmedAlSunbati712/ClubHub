@@ -1,3 +1,6 @@
+# Josephine Conley, CS61, Spring 2026
+# handles CRUD operations for memberships
+
 from flask import g, request, jsonify
 from pydantic import ValidationError
 from schemas import UpdateMembershipSchema

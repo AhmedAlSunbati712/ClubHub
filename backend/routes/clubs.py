@@ -1,3 +1,6 @@
+# Josephine Conley, CS61, Spring 2026
+# routes for /api/clubs and /api/clubs/:clubId
+
 from flask import Blueprint
 from controllers import club_controller
 from middleware import auth

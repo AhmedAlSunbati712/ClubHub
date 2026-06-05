@@ -1,5 +1,7 @@
+# Josephine Conley, CS61, Spring 2026
+# database queries for membership creation and lookups
+
 from config import get_connection
-from models.enums import MembershipStatus, ClubRole
 
 def create_membership(userId, clubId, role, status):
     connection = get_connection()
@@ -30,7 +32,7 @@ def get_membership(userId, clubId):
         cursor.close()
         connection.close()
 
-def get_club_memberships(clubId):
+def get_memberships_by_club(clubId):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
@@ -40,7 +42,7 @@ def get_club_memberships(clubId):
         cursor.close()
         connection.close()
 
-def get_user_memberships(userId):
+def get_memberships_by_user(userId):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:

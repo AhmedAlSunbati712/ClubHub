@@ -1,3 +1,6 @@
+# Josephine Conley, CS61, Spring 2026
+# routes for /api/locations and /api/locations/:locationId
+
 from flask import Blueprint
 from controllers import location_controller
 from middleware import auth

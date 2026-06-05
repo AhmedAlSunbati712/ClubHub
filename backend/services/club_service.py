@@ -1,5 +1,25 @@
+# Josephine Conley, CS61, Spring 2026
+# database queries for club creation and lookups, checking to make sure club is active/has at least one officer
+
 from config import get_connection
-from models.enums import ClubCategory,ClubStatus
+from models.enums import ClubRole, MembershipStatus
+
+def club_is_active(clubId):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute(
+            """SELECT COUNT(*) as count FROM Memberships 
+               WHERE ClubID = %s 
+               AND Status = %s 
+               AND Role IN (%s, %s)""",
+            [clubId, MembershipStatus.ACTIVE, ClubRole.OFFICER, ClubRole.PRESIDENT]
+        )
+        row = cursor.fetchone()
+        return row["count"] > 0
+    finally:
+        cursor.close()
+        connection.close()
 
 def create_club(name, description, category, status):
     connection = get_connection()

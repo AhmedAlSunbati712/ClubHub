@@ -1,3 +1,6 @@
+# Josephine Conley, CS61, Spring 2026
+# request body schemas for location creation and updates
+
 from pydantic import BaseModel
 from typing import Optional
 

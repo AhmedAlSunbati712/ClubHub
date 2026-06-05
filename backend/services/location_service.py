@@ -1,4 +1,21 @@
+# Josephine Conley, CS61, Spring 2026
+# database queries for location creation and lookups, checking to make sure location exists
+
 from config import get_connection
+
+def valid_location(locationId):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute(
+            "SELECT COUNT(*) as count FROM Events WHERE LocationID = %s",
+            [locationId]
+        )
+        row = cursor.fetchone()
+        return row["count"] > 0
+    finally:
+        cursor.close()
+        connection.close()
 
 def create_location(building,room,capacity):
     connection = get_connection()
@@ -27,15 +44,12 @@ def get_location(locationId):
 		cursor.close()
 		connection.close()
 
-def get_locations(locationId=None, building=None, room=None):
+def get_locations(building=None, room=None):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
         query = "SELECT * FROM Locations WHERE 1=1"
         params = []
-        if locationId is not None:
-            query += " AND LocationID = %s"
-            params.append(locationId)
         if building:
             query += " AND Building = %s"
             params.append(building)

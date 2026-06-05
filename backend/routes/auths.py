@@ -1,3 +1,6 @@
+# Josephine Conley, CS61, Spring 2026
+# routes for /api/auth/login and /api/auth/me
+
 from flask import Blueprint
 from controllers import auth_controller
 from middleware import auth
