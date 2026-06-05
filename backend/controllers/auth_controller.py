@@ -16,7 +16,7 @@ def login():
     if not user:
         return jsonify({"Error": "Invalid email or password"}), 401
     
-    if not auth_service.verify_password(body.password, user["Password"]):
+    if not auth_service.verify_password(body.password, user["HashedPassword"]):
         return jsonify({"Error": "Invalid email or password"}), 401
     
     token = auth_service.create_token(user)

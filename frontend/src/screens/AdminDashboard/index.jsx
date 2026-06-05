@@ -14,6 +14,7 @@ import TopClubsList from '../../components/admin/TopClubsList.jsx';
 import CapacityBar from '../../components/common/CapacityBar.jsx';
 import CountUp from '../../components/common/CountUp.jsx';
 import { formatDate } from '../../utils/format.js';
+import { ROUTES } from '../../constants/routes.js';
 
 // Image 4 — Admin Dashboard.
 export default function AdminDashboard() {
@@ -61,12 +62,12 @@ export default function AdminDashboard() {
             Quick Actions
           </h2>
           <div className="quick-actions">
-            <Link to="/admin/clubs" className="btn btn-primary btn-block">
+            <Link to={ROUTES.ADMIN_CLUBS} className="btn btn-primary btn-block">
               <Users size={16} />
               Manage Clubs
               <ArrowRight size={16} style={{ marginLeft: 'auto' }} />
             </Link>
-            <Link to="/admin/locations" className="btn btn-secondary btn-block">
+            <Link to={ROUTES.ADMIN_LOCATIONS} className="btn btn-secondary btn-block">
               <MapPin size={16} />
               Manage Locations
             </Link>

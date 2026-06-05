@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, UserPlus, Trash2, CheckCircle2, XCircle } from 'lucide-react';
-import { useClub } from '../hooks/useClubs.js';
-import { useMembership } from '../hooks/useMembership.js';
-import { useToast } from '../context/ToastContext.jsx';
-import { useConfirm } from '../context/ConfirmContext.jsx';
-import Avatar from '../components/common/Avatar.jsx';
-import EmptyState from '../components/common/EmptyState.jsx';
+import { useClub } from '../../hooks/useClubs.js';
+import { useMembership } from '../../hooks/useMembership.js';
+import { useToast } from '../../context/ToastContext.jsx';
+import { useConfirm } from '../../context/ConfirmContext.jsx';
+import Avatar from '../../components/common/Avatar.jsx';
+import EmptyState from '../../components/common/EmptyState.jsx';
 import { Inbox } from 'lucide-react';
-import RoleBadge from '../components/common/RoleBadge.jsx';
-import Button from '../components/common/Button.jsx';
-import { formatDate } from '../utils/format.js';
+import RoleBadge from '../../components/common/RoleBadge.jsx';
+import Button from '../../components/common/Button.jsx';
+import { formatDate } from '../../utils/format.js';
 
 // Images 9, 10, 11 — tabbed: Members / Pending / Settings.
 export default function ManageClub() {

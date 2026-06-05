@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { SearchX } from 'lucide-react';
-import { useClubs } from '../hooks/useClubs.js';
-import { useToast } from '../context/ToastContext.jsx';
-import SearchBar from '../components/common/SearchBar.jsx';
-import ClubCard from '../components/clubs/ClubCard.jsx';
-import EmptyState from '../components/common/EmptyState.jsx';
-import { clubCategories } from '../data/fixtures.js';
+import { useClubs } from '../../hooks/useClubs.js';
+import { useToast } from '../../context/ToastContext.jsx';
+import SearchBar from '../../components/common/SearchBar.jsx';
+import ClubCard from '../../components/clubs/ClubCard.jsx';
+import EmptyState from '../../components/common/EmptyState.jsx';
+import { clubCategories } from '../../data/fixtures.js';
 
 // Image 6 — Browse Clubs.
 export default function Clubs() {

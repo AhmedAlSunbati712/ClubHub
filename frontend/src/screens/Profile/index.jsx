@@ -1,11 +1,12 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Users, Clock, CalendarDays, Award, LogOut } from 'lucide-react';
-import { useAuth } from '../context/AuthContext.jsx';
-import Avatar from '../components/common/Avatar.jsx';
-import RoleBadge from '../components/common/RoleBadge.jsx';
-import StatCard from '../components/common/StatCard.jsx';
-import EventListItem from '../components/events/EventListItem.jsx';
-import { formatDate } from '../utils/format.js';
+import { useAuth } from '../../context/AuthContext.jsx';
+import Avatar from '../../components/common/Avatar.jsx';
+import RoleBadge from '../../components/common/RoleBadge.jsx';
+import StatCard from '../../components/common/StatCard.jsx';
+import EventListItem from '../../components/events/EventListItem.jsx';
+import { formatDate } from '../../utils/format.js';
+import { ROUTES } from '../../constants/routes.js';
 
 // Image 3 — My Profile.
 export default function Profile() {
@@ -37,7 +38,7 @@ export default function Profile() {
               type="button"
               className="btn btn-secondary btn-block"
               style={{ marginTop: 'var(--space-4)' }}
-              onClick={() => navigate('/login')}
+              onClick={() => navigate(ROUTES.LOGIN)}
             >
               <LogOut size={16} />
               Sign Out
@@ -80,7 +81,11 @@ export default function Profile() {
                     <Users />
                   </span>
                   <div className="my-club-row__body">
-                    <Link to={`/clubs/${club.id}`} className="my-club-row__name" style={{ color: 'var(--text)' }}>
+                    <Link
+                      to={ROUTES.CLUB_DETAIL.replace(':clubId', club.id)}
+                      className="my-club-row__name"
+                      style={{ color: 'var(--text)' }}
+                    >
                       {club.name}
                     </Link>
                     <span className="my-club-row__meta">
@@ -91,7 +96,10 @@ export default function Profile() {
                   <div className="my-club-row__right">
                     <RoleBadge role={club.role} />
                     {canManage && (
-                      <Link to={`/clubs/${club.id}/manage`} className="btn btn-secondary btn-sm">
+                      <Link
+                        to={ROUTES.MANAGE_CLUB.replace(':clubId', club.id)}
+                        className="btn btn-secondary btn-sm"
+                      >
                         Manage
                       </Link>
                     )}

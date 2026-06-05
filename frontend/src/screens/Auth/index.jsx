@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Mail, Lock, User, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { useToast } from '../context/ToastContext.jsx';
-import Button from '../components/common/Button.jsx';
-import campusBg from '../assets/dormitory.jpg';
-import wordmark from '../assets/dartmouth-wordmark.png';
+import { useToast } from '../../context/ToastContext.jsx';
+import Button from '../../components/common/Button.jsx';
+import campusBg from '../../assets/dormitory.jpg';
+import wordmark from '../../assets/dartmouth-wordmark.png';
+import { ROUTES } from '../../constants/routes.js';
 
 // Split auth screen — media + brand on the left, sign in / sign up on the right.
 export default function Auth() {
@@ -17,7 +18,7 @@ export default function Auth() {
   const submit = (e) => {
     e.preventDefault();
     toast(isLogin ? 'Welcome back to DartClubs' : 'Account created — welcome to DartClubs');
-    navigate('/events');
+    navigate(ROUTES.EVENTS);
   };
 
   return (

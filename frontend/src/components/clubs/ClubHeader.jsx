@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Users, Settings } from 'lucide-react';
 import { useToast } from '../../context/ToastContext.jsx';
 import { useConfirm } from '../../context/ConfirmContext.jsx';
+import { ROUTES } from '../../constants/routes.js';
 
 // gradient hero banner on club detail (Dartmouth green).
 export default function ClubHeader({ club }) {
@@ -54,7 +55,7 @@ export default function ClubHeader({ club }) {
           </button>
         )}
         {canManage && (
-          <Link to={`/clubs/${club.id}/manage`} className="btn btn-on-light">
+          <Link to={ROUTES.MANAGE_CLUB.replace(':clubId', club.id)} className="btn btn-on-light">
             <Settings size={16} />
             Manage Club
           </Link>

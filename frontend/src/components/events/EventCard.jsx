@@ -5,6 +5,7 @@ import StatusBadge from '../common/StatusBadge.jsx';
 import Button from '../common/Button.jsx';
 import { formatEventDate } from '../../utils/format.js';
 import { capacityColor, isFull, seatsLeft } from '../../utils/capacity.js';
+import { ROUTES } from '../../constants/routes.js';
 
 // full card w/ capacity + action buttons.
 export default function EventCard({ event, onRsvp, onCancel, onCheckIn, onWaitlist }) {
@@ -29,7 +30,7 @@ export default function EventCard({ event, onRsvp, onCancel, onCheckIn, onWaitli
         <StatusBadge status={status} />
       </div>
 
-      <Link to={`/clubs/${event.clubId}`} className="club-link">
+      <Link to={ROUTES.CLUB_DETAIL.replace(':clubId', event.clubId)} className="club-link">
         <Users />
         {event.club}
       </Link>

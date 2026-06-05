@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Plus, CalendarDays, MapPin } from 'lucide-react';
-import { useClub } from '../hooks/useClubs.js';
-import { useToast } from '../context/ToastContext.jsx';
-import ClubHeader from '../components/clubs/ClubHeader.jsx';
-import ClubStats from '../components/clubs/ClubStats.jsx';
-import OfficerList from '../components/clubs/OfficerList.jsx';
-import CapacityBar from '../components/common/CapacityBar.jsx';
-import Button from '../components/common/Button.jsx';
-import CreateEventModal from '../components/events/CreateEventModal.jsx';
-import { getEventsByIds } from '../data/fixtures.js';
-import { formatEventDate } from '../utils/format.js';
+import { useClub } from '../../hooks/useClubs.js';
+import { useToast } from '../../context/ToastContext.jsx';
+import ClubHeader from '../../components/clubs/ClubHeader.jsx';
+import ClubStats from '../../components/clubs/ClubStats.jsx';
+import OfficerList from '../../components/clubs/OfficerList.jsx';
+import CapacityBar from '../../components/common/CapacityBar.jsx';
+import Button from '../../components/common/Button.jsx';
+import CreateEventModal from '../../components/events/CreateEventModal.jsx';
+import { getEventsByIds } from '../../data/fixtures.js';
+import { formatEventDate } from '../../utils/format.js';
 
 // Images 7, 8 — club hero + events + officers + stats.
 export default function ClubDetail() {
