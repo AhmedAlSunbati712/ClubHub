@@ -4,5 +4,6 @@
 from pydantic import BaseModel
 from models.enums import RSVPStatus
 
+
 class UpdateRSVPSchema(BaseModel):
     status: RSVPStatus

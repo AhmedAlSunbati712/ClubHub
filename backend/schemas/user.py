@@ -2,6 +2,7 @@ from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional
 from models.enums import UserRole
 
+
 class CreateUserSchema(BaseModel):
     name: str
     email: EmailStr
@@ -14,6 +15,7 @@ class CreateUserSchema(BaseModel):
         if not v.endswith("@dartmouth.edu"):
             raise ValueError("Must be a Dartmouth email address")
         return v
+
     @field_validator("password")
     @classmethod
     def validate_pw(cls, v):
@@ -21,12 +23,13 @@ class CreateUserSchema(BaseModel):
             raise ValueError("Must be non-empty password")
         return v
 
+
 class UpdateUserSchema(BaseModel):
     name: Optional[str] = None
     email: Optional[EmailStr] = None
     role: Optional[UserRole] = None
     password: Optional[str] = None
-    
+
     @field_validator("email")
     @classmethod
     def must_be_dartmouth_email(cls, v):

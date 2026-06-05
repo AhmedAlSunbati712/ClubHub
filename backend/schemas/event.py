@@ -6,12 +6,14 @@ from typing import Optional
 from datetime import datetime
 from models.enums import EventStatus
 
+
 class CreateEventSchema(BaseModel):
     clubId: int
     locationId: Optional[int] = None
     title: str
     eventDateTime: datetime
     eventCapacity: Optional[int] = None
+
 
 class UpdateEventSchema(BaseModel):
     locationId: Optional[int] = None

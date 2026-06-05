@@ -4,13 +4,14 @@
 
 from config import get_connection
 
+
 def valid_location(locationId):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
         cursor.execute(
-            "SELECT COUNT(*) as count FROM Events WHERE LocationID = %s",
-            [locationId]
+            "SELECT COUNT(*) as count FROM Locations WHERE LocationID = %s",
+            [locationId],
         )
         row = cursor.fetchone()
         return row["count"] > 0
@@ -18,13 +19,14 @@ def valid_location(locationId):
         cursor.close()
         connection.close()
 
-def create_location(building,room,capacity):
+
+def create_location(building, room, capacity):
     connection = get_connection()
     cursor = connection.cursor()
     try:
         cursor.execute(
             "INSERT INTO Locations (Building, Room, Capacity) VALUES (%s, %s, %s)",
-            [building,room,capacity]
+            [building, room, capacity],
         )
         connection.commit()
         return cursor.lastrowid
@@ -35,15 +37,17 @@ def create_location(building,room,capacity):
         cursor.close()
         connection.close()
 
+
 def get_location(locationId):
-	connection = get_connection()
-	cursor = connection.cursor(dictionary=True)
-	try:
-		cursor.execute("SELECT * FROM Locations WHERE LocationID = %s", [locationId])
-		return cursor.fetchone()
-	finally:
-		cursor.close()
-		connection.close()
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT * FROM Locations WHERE LocationID = %s", [locationId])
+        return cursor.fetchone()
+    finally:
+        cursor.close()
+        connection.close()
+
 
 def get_locations(building=None, room=None):
     connection = get_connection()
@@ -62,6 +66,7 @@ def get_locations(building=None, room=None):
     finally:
         cursor.close()
         connection.close()
+
 
 def update_location(locationId, building=None, room=None, capacity=None):
     fields = []
@@ -84,7 +89,9 @@ def update_location(locationId, building=None, room=None, capacity=None):
     cursor = connection.cursor()
     try:
         params.append(locationId)
-        cursor.execute(f"UPDATE Locations SET {', '.join(fields)} WHERE LocationID = %s", params)
+        cursor.execute(
+            f"UPDATE Locations SET {', '.join(fields)} WHERE LocationID = %s", params
+        )
         connection.commit()
         return cursor.rowcount
     except Exception as e:
@@ -93,6 +100,7 @@ def update_location(locationId, building=None, room=None, capacity=None):
     finally:
         cursor.close()
         connection.close()
+
 
 def delete_location(locationId):
     connection = get_connection()

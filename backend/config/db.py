@@ -1,6 +1,7 @@
 import mysql.connector
 from .env import ENV
 
+
 def get_connection():
     return mysql.connector.connect(
         host=ENV.DB_HOST,

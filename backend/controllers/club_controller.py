@@ -8,6 +8,7 @@ from schemas import CreateClubSchema, UpdateClubSchema
 from services import club_service, membership_service
 from models.enums import UserRole, ClubRole, MembershipStatus
 
+
 def _is_officer_or_admin(userId, clubId, user_role):
     if user_role == UserRole.ADMIN:
         return True
@@ -16,29 +17,31 @@ def _is_officer_or_admin(userId, clubId, user_role):
         return False
     return membership["Role"] in [ClubRole.OFFICER, ClubRole.PRESIDENT]
 
+
 def create_club():
-	try:
-		body = CreateClubSchema(**request.get_json())
-	except ValidationError as e:
-		return jsonify({"Errors": e.errors()}), 422
-	
-	try:
-		club_id = club_service.create_club(
-			name=body.name, 
-			description=body.description,
-			category=body.category,
-			status=body.status
-		)
-		current_user = g.current_user
-		membership_service.create_membership(
-			userId=current_user["sub"],
-			clubId=club_id,
-			role=ClubRole.PRESIDENT,
-			status=MembershipStatus.ACTIVE
-		)
-		return jsonify({"clubId": club_id}), 201
-	except Exception as e:
-		return jsonify({"Error": f"Couldn't create club: {e}"}), 500
+    try:
+        body = CreateClubSchema(**request.get_json())
+    except ValidationError as e:
+        return jsonify({"Errors": e.errors()}), 422
+
+    try:
+        club_id = club_service.create_club(
+            name=body.name,
+            description=body.description,
+            category=body.category,
+            status=body.status,
+        )
+        current_user = g.current_user
+        membership_service.create_membership(
+            userId=current_user["sub"],
+            clubId=club_id,
+            role=ClubRole.PRESIDENT,
+            status=MembershipStatus.ACTIVE,
+        )
+        return jsonify({"clubId": club_id}), 201
+    except Exception as e:
+        return jsonify({"Error": f"Couldn't create club: {e}"}), 500
+
 
 def get_club(clubId):
     try:
@@ -49,6 +52,7 @@ def get_club(clubId):
     except Exception as e:
         return jsonify({"Error": f"Failed to get club: {e}"}), 500
 
+
 def get_clubs():
     name = request.args.get("name")
     category = request.args.get("category")
@@ -57,6 +61,7 @@ def get_clubs():
         return jsonify(clubs), 200
     except Exception as e:
         return jsonify({"Error": f"Failed to get clubs: {e}"}), 500
+
 
 def update_club(clubId):
     club = club_service.get_club(clubId)
@@ -78,13 +83,14 @@ def update_club(clubId):
             name=body.name,
             description=body.description,
             category=body.category,
-            status=body.status
+            status=body.status,
         )
         if count is None:
             return jsonify({"Error": "No fields provided to update"}), 400
         return jsonify({"message": "Success"}), 200
     except Exception as e:
         return jsonify({"Error": f"Failed to update club: {e}"}), 500
+
 
 def delete_club(clubId):
     club = club_service.get_club(clubId)

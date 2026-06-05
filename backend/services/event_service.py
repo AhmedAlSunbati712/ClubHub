@@ -4,6 +4,7 @@
 from config import get_connection
 from models.enums import MembershipStatus
 
+
 # check if a user is an officer/president of a club (used for permission checks)
 def get_user_club_role(userId, clubId):
     connection = get_connection()
@@ -11,7 +12,7 @@ def get_user_club_role(userId, clubId):
     try:
         cursor.execute(
             "SELECT Role FROM Memberships WHERE UserID = %s AND ClubID = %s AND Status = %s",
-            [userId, clubId, MembershipStatus.ACTIVE]
+            [userId, clubId, MembershipStatus.ACTIVE],
         )
         row = cursor.fetchone()
         return row["Role"] if row else None
@@ -19,17 +20,21 @@ def get_user_club_role(userId, clubId):
         cursor.close()
         connection.close()
 
+
 # used to validate event capacity against the room's max occupancy
 def get_location_capacity(locationId):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT Capacity FROM Locations WHERE LocationID = %s", [locationId])
+        cursor.execute(
+            "SELECT Capacity FROM Locations WHERE LocationID = %s", [locationId]
+        )
         row = cursor.fetchone()
         return row["Capacity"] if row else None
     finally:
         cursor.close()
         connection.close()
+
 
 def create_event(clubId, title, eventDateTime, locationId=None, eventCapacity=None):
     connection = get_connection()
@@ -37,7 +42,7 @@ def create_event(clubId, title, eventDateTime, locationId=None, eventCapacity=No
     try:
         cursor.execute(
             "INSERT INTO Events (ClubID, LocationID, Title, EventDateTime, EventCapacity, ConfirmedCount) VALUES (%s, %s, %s, %s, %s, 0)",
-            [clubId, locationId, title, eventDateTime, eventCapacity]
+            [clubId, locationId, title, eventDateTime, eventCapacity],
         )
         connection.commit()
         return cursor.lastrowid
@@ -48,6 +53,7 @@ def create_event(clubId, title, eventDateTime, locationId=None, eventCapacity=No
         cursor.close()
         connection.close()
 
+
 def get_event_by_id(eventId):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
@@ -57,6 +63,7 @@ def get_event_by_id(eventId):
     finally:
         cursor.close()
         connection.close()
+
 
 def get_events(clubId=None, status=None, title=None):
     connection = get_connection()
@@ -79,7 +86,15 @@ def get_events(clubId=None, status=None, title=None):
         cursor.close()
         connection.close()
 
-def update_event(eventId, locationId=None, title=None, eventDateTime=None, eventCapacity=None, status=None):
+
+def update_event(
+    eventId,
+    locationId=None,
+    title=None,
+    eventDateTime=None,
+    eventCapacity=None,
+    status=None,
+):
     fields = []
     params = []
 
@@ -106,7 +121,9 @@ def update_event(eventId, locationId=None, title=None, eventDateTime=None, event
     cursor = connection.cursor()
     try:
         params.append(eventId)
-        cursor.execute(f"UPDATE Events SET {', '.join(fields)} WHERE EventID = %s", params)
+        cursor.execute(
+            f"UPDATE Events SET {', '.join(fields)} WHERE EventID = %s", params
+        )
         connection.commit()
         return cursor.rowcount
     except Exception as e:
@@ -116,6 +133,7 @@ def update_event(eventId, locationId=None, title=None, eventDateTime=None, event
         cursor.close()
         connection.close()
 
+
 # increment/decrement the denormalized confirmed count on the event row
 def update_confirmed_count(eventId, delta):
     connection = get_connection()
@@ -123,7 +141,7 @@ def update_confirmed_count(eventId, delta):
     try:
         cursor.execute(
             "UPDATE Events SET ConfirmedCount = GREATEST(0, ConfirmedCount + %s) WHERE EventID = %s",
-            [delta, eventId]
+            [delta, eventId],
         )
         connection.commit()
     except Exception as e:
@@ -132,6 +150,7 @@ def update_confirmed_count(eventId, delta):
     finally:
         cursor.close()
         connection.close()
+
 
 def delete_event(eventId):
     connection = get_connection()

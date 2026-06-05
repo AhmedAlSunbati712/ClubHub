@@ -1,8 +1,10 @@
 from enum import Enum
 
+
 class UserRole(str, Enum):
     STUDENT = "Student"
     ADMIN = "Admin"
+
 
 class ClubCategory(str, Enum):
     ACADEMIC = "Academic"
@@ -17,24 +19,29 @@ class ClubCategory(str, Enum):
     MEDIA = "Media & Publications"
     OTHER = "Other"
 
+
 class ClubRole(str, Enum):
     MEMBER = "Member"
     OFFICER = "Officer"
     PRESIDENT = "President"
 
+
 class ClubStatus(str, Enum):
     ACTIVE = "Active"
     INACTIVE = "Inactive"
+
 
 class MembershipStatus(str, Enum):
     ACTIVE = "Active"
     PENDING = "Pending"
     INACTIVE = "Inactive"
 
+
 class EventStatus(str, Enum):
     PUBLISHED = "Published"
     CANCELLED = "Cancelled"
     COMPLETED = "Completed"
+
 
 class RSVPStatus(str, Enum):
     CONFIRMED = "Confirmed"

@@ -5,6 +5,7 @@
 from config import get_connection
 from models.enums import ClubRole, MembershipStatus
 
+
 def club_is_active(clubId):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
@@ -14,7 +15,7 @@ def club_is_active(clubId):
                WHERE ClubID = %s 
                AND Status = %s 
                AND Role IN (%s, %s)""",
-            [clubId, MembershipStatus.ACTIVE, ClubRole.OFFICER, ClubRole.PRESIDENT]
+            [clubId, MembershipStatus.ACTIVE, ClubRole.OFFICER, ClubRole.PRESIDENT],
         )
         row = cursor.fetchone()
         return row["count"] > 0
@@ -22,13 +23,14 @@ def club_is_active(clubId):
         cursor.close()
         connection.close()
 
+
 def create_club(name, description, category, status):
     connection = get_connection()
     cursor = connection.cursor()
     try:
         cursor.execute(
             "INSERT INTO Clubs (ClubName, Description, Category, Status) VALUES (%s, %s, %s, %s)",
-            [name, description, category, status]
+            [name, description, category, status],
         )
         connection.commit()
         return cursor.lastrowid
@@ -39,16 +41,18 @@ def create_club(name, description, category, status):
         cursor.close()
         connection.close()
 
+
 def get_club(clubId):
-	connection = get_connection()
-	cursor = connection.cursor(dictionary=True)
-	try:
-		cursor.execute("SELECT * FROM Clubs WHERE ClubID = %s", [clubId])
-		return cursor.fetchone()
-	finally:
-		cursor.close()
-		connection.close()
-	
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT * FROM Clubs WHERE ClubID = %s", [clubId])
+        return cursor.fetchone()
+    finally:
+        cursor.close()
+        connection.close()
+
+
 def get_all_clubs(name=None, category=None):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
@@ -66,6 +70,7 @@ def get_all_clubs(name=None, category=None):
     finally:
         cursor.close()
         connection.close()
+
 
 def update_club(clubId, name=None, description=None, category=None, status=None):
     fields = []
@@ -91,7 +96,9 @@ def update_club(clubId, name=None, description=None, category=None, status=None)
     cursor = connection.cursor()
     try:
         params.append(clubId)
-        cursor.execute(f"UPDATE Clubs SET {', '.join(fields)} WHERE ClubID = %s", params)
+        cursor.execute(
+            f"UPDATE Clubs SET {', '.join(fields)} WHERE ClubID = %s", params
+        )
         connection.commit()
         return cursor.rowcount
     except Exception as e:
@@ -100,6 +107,7 @@ def update_club(clubId, name=None, description=None, category=None, status=None)
     finally:
         cursor.close()
         connection.close()
+
 
 def delete_club(clubId):
     connection = get_connection()

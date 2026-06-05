@@ -7,11 +7,13 @@ from schemas import UpdateRSVPSchema
 from services import event_service, rsvp_service
 from models.enums import UserRole, ClubRole, RSVPStatus, EventStatus
 
+
 def _is_officer_or_admin(userId, clubId, user_role):
     if user_role == UserRole.ADMIN:
         return True
     club_role = event_service.get_user_club_role(userId, clubId)
     return club_role in [ClubRole.OFFICER, ClubRole.PRESIDENT]
+
 
 def create_rsvp(eventId):
     current_user = g.current_user
@@ -23,7 +25,12 @@ def create_rsvp(eventId):
 
     # EERD: do not accept RSVPs for completed or cancelled events
     if event["Status"] in [EventStatus.CANCELLED, EventStatus.COMPLETED]:
-        return jsonify({"Error": "RSVPs are not accepted for completed or cancelled events"}), 400
+        return (
+            jsonify(
+                {"Error": "RSVPs are not accepted for completed or cancelled events"}
+            ),
+            400,
+        )
 
     existing = rsvp_service.get_rsvp(eventId, userId)
     if existing and existing["RSVPStatus"] != RSVPStatus.CANCELLED:
@@ -32,7 +39,11 @@ def create_rsvp(eventId):
     # use the denormalized ConfirmedCount to decide confirmed vs waitlisted
     capacity = event.get("EventCapacity")
     if capacity is not None:
-        status = RSVPStatus.CONFIRMED if event["ConfirmedCount"] < capacity else RSVPStatus.WAITLISTED
+        status = (
+            RSVPStatus.CONFIRMED
+            if event["ConfirmedCount"] < capacity
+            else RSVPStatus.WAITLISTED
+        )
     else:
         status = RSVPStatus.CONFIRMED
 
@@ -49,13 +60,16 @@ def create_rsvp(eventId):
     except Exception as e:
         return jsonify({"Error": f"Failed to RSVP: {e}"}), 500
 
+
 def get_rsvps(eventId):
     current_user = g.current_user
     event = event_service.get_event_by_id(eventId)
     if not event:
         return jsonify({"Error": f"Event with id {eventId} not found"}), 404
 
-    if not _is_officer_or_admin(current_user["sub"], event["ClubID"], current_user.get("role")):
+    if not _is_officer_or_admin(
+        current_user["sub"], event["ClubID"], current_user.get("role")
+    ):
         return jsonify({"Error": "Only officers or admins can view the RSVP list"}), 403
 
     try:
@@ -63,6 +77,7 @@ def get_rsvps(eventId):
         return jsonify(rsvps), 200
     except Exception as e:
         return jsonify({"Error": f"Failed to get RSVPs: {e}"}), 500
+
 
 def update_rsvp(eventId, userId):
     current_user = g.current_user
@@ -92,6 +107,7 @@ def update_rsvp(eventId, userId):
         return jsonify({"message": "Success"}), 200
     except Exception as e:
         return jsonify({"Error": f"Failed to update RSVP: {e}"}), 500
+
 
 def delete_rsvp(eventId, userId):
     current_user = g.current_user

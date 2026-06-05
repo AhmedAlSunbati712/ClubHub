@@ -6,6 +6,7 @@ from models.enums import RSVPStatus
 
 # check-in lives on the RSVP row (CheckedIn + CheckInTime) per the EERD, not a separate table
 
+
 def create_checkin(eventId, userId):
     # user must have a non-cancelled RSVP to check in
     connection = get_connection()
@@ -13,7 +14,7 @@ def create_checkin(eventId, userId):
     try:
         cursor.execute(
             "UPDATE RSVPs SET CheckedIn = 1, CheckInTime = NOW() WHERE EventID = %s AND UserID = %s AND RSVPStatus != %s",
-            [eventId, userId, RSVPStatus.CANCELLED]
+            [eventId, userId, RSVPStatus.CANCELLED],
         )
         connection.commit()
         return cursor.rowcount
@@ -24,13 +25,14 @@ def create_checkin(eventId, userId):
         cursor.close()
         connection.close()
 
+
 def delete_checkin(eventId, userId):
     connection = get_connection()
     cursor = connection.cursor()
     try:
         cursor.execute(
             "UPDATE RSVPs SET CheckedIn = 0, CheckInTime = NULL WHERE EventID = %s AND UserID = %s",
-            [eventId, userId]
+            [eventId, userId],
         )
         connection.commit()
         return cursor.rowcount
@@ -40,6 +42,7 @@ def delete_checkin(eventId, userId):
     finally:
         cursor.close()
         connection.close()
+
 
 def get_checkins_for_event(eventId):
     connection = get_connection()
@@ -49,7 +52,7 @@ def get_checkins_for_event(eventId):
             """SELECT r.UserID, r.CheckInTime, u.Name, u.Email
                FROM RSVPs r JOIN Users u ON r.UserID = u.UserID
                WHERE r.EventID = %s AND r.CheckedIn = 1""",
-            [eventId]
+            [eventId],
         )
         return cursor.fetchall()
     finally:

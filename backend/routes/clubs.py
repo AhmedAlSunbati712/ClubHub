@@ -8,23 +8,28 @@ from middleware import auth
 
 bp = Blueprint("clubs", __name__, url_prefix="/api/clubs")
 
+
 @bp.post("/")
 @auth.require_auth()
 def create_club():
     return club_controller.create_club()
 
+
 @bp.get("/<int:clubId>")
 def get_club(clubId: int):
     return club_controller.get_club(clubId)
+
 
 @bp.get("/")
 def get_clubs():
     return club_controller.get_clubs()
 
+
 @bp.put("/<int:clubId>")
 @auth.require_auth()
 def update_club(clubId: int):
     return club_controller.update_club(clubId)
+
 
 @bp.delete("/<int:clubId>")
 @auth.require_auth()

@@ -1,6 +1,7 @@
 from config import get_connection
 from .auth_service import hash_password
 
+
 def create_user(name, email, role, password):
     """
     Description: Create a user given their name, email and role
@@ -11,7 +12,7 @@ def create_user(name, email, role, password):
     try:
         cursor.execute(
             "INSERT INTO Users (Name, Email, Role, HashedPassword) VALUES (%s, %s, %s, %s)",
-            [name, email, role, hashed_password]
+            [name, email, role, hashed_password],
         )
         connection.commit()
         return cursor.lastrowid
@@ -22,15 +23,20 @@ def create_user(name, email, role, password):
         cursor.close()
         connection.close()
 
+
 def get_user_by_id(userId):
     """
     Description: Get a user by their id.
     """
-    
+
     connection = get_connection()
-    cursor = connection.cursor(dictionary=True) # dictionary = True to return a dictionary instead of a tuple
+    cursor = connection.cursor(
+        dictionary=True
+    )  # dictionary = True to return a dictionary instead of a tuple
     try:
-        cursor.execute("SELECT UserID, Name, Email, Role FROM Users WHERE UserID = %s", [userId])
+        cursor.execute(
+            "SELECT UserID, Name, Email, Role FROM Users WHERE UserID = %s", [userId]
+        )
         return cursor.fetchone()
     except Exception as e:
         raise e
@@ -38,11 +44,12 @@ def get_user_by_id(userId):
         cursor.close()
         connection.close()
 
+
 def get_users(userId=None, name=None, email=None, userRole=None):
     """
     Description: Get users given a query that combines in set of fields
     """
-    
+
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
@@ -70,11 +77,12 @@ def get_users(userId=None, name=None, email=None, userRole=None):
         cursor.close()
         connection.close()
 
+
 def update_user(userId, name=None, email=None, role=None, password=None):
     """
     Description: Update a set of field for a user given their id.
     """
-    
+
     if not name and not email and not role and not password:
         return None
 
@@ -98,7 +106,9 @@ def update_user(userId, name=None, email=None, role=None, password=None):
             params.append(hash_password(password))
 
         params.append(userId)
-        cursor.execute(f"UPDATE Users SET {', '.join(fields)} WHERE UserID = %s", params)
+        cursor.execute(
+            f"UPDATE Users SET {', '.join(fields)} WHERE UserID = %s", params
+        )
         connection.commit()
         return cursor.rowcount
     except Exception as e:
@@ -108,11 +118,12 @@ def update_user(userId, name=None, email=None, role=None, password=None):
         cursor.close()
         connection.close()
 
+
 def delete_user(userId):
     """
     Description: Delete a record for a user given their id.
     """
-    
+
     connection = get_connection()
     cursor = connection.cursor()
     # TODO: We need to enforce the business rule here that a user account can't be deleted if they are the sole office of a club
