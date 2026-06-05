@@ -1,15 +1,15 @@
 import { useState } from 'react';
 import { CalendarSearch, Plus } from 'lucide-react';
-import { useEvents } from '../hooks/useEvents.js';
-import { useClubs } from '../hooks/useClubs.js';
-import { useAuth } from '../context/AuthContext.jsx';
-import { useToast } from '../context/ToastContext.jsx';
-import SearchBar from '../components/common/SearchBar.jsx';
-import EventCard from '../components/events/EventCard.jsx';
-import EmptyState from '../components/common/EmptyState.jsx';
-import Button from '../components/common/Button.jsx';
-import CreateEventModal from '../components/events/CreateEventModal.jsx';
-import { eventCategories } from '../data/fixtures.js';
+import { useEvents } from '../../hooks/useEvents.js';
+import { useClubs } from '../../hooks/useClubs.js';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { useToast } from '../../context/ToastContext.jsx';
+import SearchBar from '../../components/common/SearchBar.jsx';
+import EventCard from '../../components/events/EventCard.jsx';
+import EmptyState from '../../components/common/EmptyState.jsx';
+import Button from '../../components/common/Button.jsx';
+import CreateEventModal from '../../components/events/CreateEventModal.jsx';
+import { eventCategories } from '../../data/fixtures.js';
 
 // Image 1 — Upcoming Events grid.
 export default function Events() {

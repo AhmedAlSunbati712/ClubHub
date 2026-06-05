@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { Users, User } from 'lucide-react';
 import RoleBadge from '../common/RoleBadge.jsx';
 import Button from '../common/Button.jsx';
+import { ROUTES } from '../../constants/routes.js';
 
 // Browse Clubs card.
 export default function ClubCard({ club, onApply }) {
@@ -17,7 +18,7 @@ export default function ClubCard({ club, onApply }) {
         </span>
         <div>
           <h3 className="club-card__title">
-            <Link to={`/clubs/${club.id}`}>{club.name}</Link>
+            <Link to={ROUTES.CLUB_DETAIL.replace(':clubId', club.id)}>{club.name}</Link>
           </h3>
           <div className="club-card__badges">
             {club.viewerRole && <RoleBadge role={club.viewerRole} />}
@@ -34,11 +35,14 @@ export default function ClubCard({ club, onApply }) {
       </span>
 
       <div className="club-card__actions">
-        <Link to={`/clubs/${club.id}`} className="btn btn-secondary btn-block">
+        <Link to={ROUTES.CLUB_DETAIL.replace(':clubId', club.id)} className="btn btn-secondary btn-block">
           View Details
         </Link>
         {canManage && (
-          <Link to={`/clubs/${club.id}/manage`} className="btn btn-primary btn-block">
+          <Link
+            to={ROUTES.MANAGE_CLUB.replace(':clubId', club.id)}
+            className="btn btn-primary btn-block"
+          >
             Manage
           </Link>
         )}

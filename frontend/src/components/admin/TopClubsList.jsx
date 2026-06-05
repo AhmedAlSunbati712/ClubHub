@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { ChevronRight } from 'lucide-react';
+import { ROUTES } from '../../constants/routes.js';
 
 // ranked list on dashboard.
 export default function TopClubsList({ clubs = [] }) {
@@ -10,7 +11,7 @@ export default function TopClubsList({ clubs = [] }) {
           <span className="top-club__rank">{i + 1}</span>
           <span className="top-club__body">
             <span className="top-club__name">
-              <Link to={`/clubs/${club.id}`}>{club.name}</Link>
+              <Link to={ROUTES.CLUB_DETAIL.replace(':clubId', club.id)}>{club.name}</Link>
             </span>
             <span className="top-club__count tnum">{club.memberCount} members</span>
           </span>

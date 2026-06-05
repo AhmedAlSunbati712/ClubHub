@@ -3,11 +3,12 @@ import { CalendarDays, Users, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Avatar from './Avatar.jsx';
 import RoleBadge from './RoleBadge.jsx';
+import { ROUTES } from '../../constants/routes.js';
 
 const TABS = [
-  { to: '/events', label: 'Events', icon: CalendarDays },
-  { to: '/clubs', label: 'Clubs', icon: Users },
-  { to: '/admin', label: 'Admin', icon: ShieldCheck },
+  { to: ROUTES.EVENTS, label: 'Events', icon: CalendarDays },
+  { to: ROUTES.CLUBS, label: 'Clubs', icon: Users },
+  { to: ROUTES.ADMIN, label: 'Admin', icon: ShieldCheck },
 ];
 
 // DartClubs logo + Events/Clubs/Admin tabs + user badge.
@@ -17,7 +18,7 @@ export default function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar__inner">
-        <Link to="/events" className="navbar__logo">
+        <Link to={ROUTES.EVENTS} className="navbar__logo">
           <span className="navbar__brand-mark">
             <Users size={19} strokeWidth={2.5} />
           </span>
@@ -43,7 +44,7 @@ export default function Navbar() {
         <span className="navbar__spacer" />
 
         {user && (
-          <Link to="/profile" className="navbar__user" aria-label="View your profile">
+          <Link to={ROUTES.PROFILE} className="navbar__user" aria-label="View your profile">
             <span className="navbar__user-meta">
               <span className="navbar__user-name">{user.name}</span>
               <RoleBadge role={user.role} />

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Users, Pencil, Trash2 } from 'lucide-react';
 import Avatar from '../common/Avatar.jsx';
+import { ROUTES } from '../../constants/routes.js';
 
 // row in admin Manage Clubs table.
 export default function ClubRow({ club, onEdit, onDelete }) {
@@ -12,7 +13,7 @@ export default function ClubRow({ club, onEdit, onDelete }) {
           <span className="icon-tile" style={{ width: 36, height: 36 }}>
             <Users size={18} />
           </span>
-          <Link to={`/clubs/${club.id}`}>{club.name}</Link>
+          <Link to={ROUTES.CLUB_DETAIL.replace(':clubId', club.id)}>{club.name}</Link>
         </span>
       </td>
       <td>
