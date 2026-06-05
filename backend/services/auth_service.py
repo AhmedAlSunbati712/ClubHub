@@ -31,7 +31,10 @@ def get_user_by_email(email):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try: 
-        cursor.execute("SELECT * FROM Users WHERE Email = %s", [email])
+        cursor.execute(
+            "SELECT UserID, Name, Email, Role, HashedPassword FROM Users WHERE Email = %s",
+            [email],
+        )
         return cursor.fetchone()
     finally:
         cursor.close()
@@ -41,7 +44,10 @@ def get_user_by_id(userId):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT * FROM Users WHERE UserID = %s", [userId])
+        cursor.execute(
+            "SELECT UserID, Name, Email, Role FROM Users WHERE UserID = %s",
+            [userId],
+        )
         return cursor.fetchone()
     finally:
         cursor.close()
