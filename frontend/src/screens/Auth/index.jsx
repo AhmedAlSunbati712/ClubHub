@@ -1,24 +1,73 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Users, Mail, Lock, User, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { useToast } from '../../context/ToastContext.jsx';
+import { toast } from 'react-toastify';
 import Button from '../../components/common/Button.jsx';
 import campusBg from '../../assets/dormitory.jpg';
 import wordmark from '../../assets/dartmouth-wordmark.png';
 import { ROUTES } from '../../constants/routes.js';
+import { useCreateUser } from '../../api/user.js';
+import { useAuth } from '../../context/AuthContext.jsx';
 
-// Split auth screen — media + brand on the left, sign in / sign up on the right.
 export default function Auth() {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { login } = useAuth();
   const [mode, setMode] = useState('login'); // 'login' | 'signup'
   const [showPw, setShowPw] = useState(false);
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    password: '',
+  });
   const isLogin = mode === 'login';
+  const { mutate: createUser, isPending: isPendingCreatingUser } = useCreateUser(() => {
+    toast.success('Account created. Sign in to continue.');
+    setMode('login');
+    setShowPw(false);
+    setForm((current) => ({
+      ...current,
+      password: '',
+    }));
+  });
 
-  const submit = (e) => {
+  const handleChange = (field) => (e) => {
+    setForm((current) => ({
+      ...current,
+      [field]: e.target.value,
+    }));
+  };
+
+  const submit = async (e) => {
     e.preventDefault();
-    toast(isLogin ? 'Welcome back to DartClubs' : 'Account created — welcome to DartClubs');
-    navigate(ROUTES.EVENTS);
+
+    if (isLogin) {
+      try {
+        await login({email: form.email, password: form.password});
+        navigate(ROUTES.PROFILE);
+    
+      } catch (error) {
+        console.log(error);
+        toast.error("Invalid email or password!")
+      }
+      return;
+    }
+
+    createUser(
+      {
+        name: form.name.trim(),
+        email: form.email.trim(),
+        password: form.password,
+      },
+      {
+        onError: (error) => {
+          const message =
+            error?.response?.data?.Error ||
+            error?.response?.data?.errors?.[0]?.msg ||
+            'Failed to create account';
+          toast.error(message);
+        },
+      },
+    );
   };
 
   return (
@@ -86,7 +135,14 @@ export default function Auth() {
                 <span className="field__label">Full name</span>
                 <span className="field__control">
                   <User className="field__icon" size={17} />
-                  <input type="text" placeholder="Alex Thompson" autoComplete="name" required />
+                  <input
+                    type="text"
+                    placeholder="Alex Thompson"
+                    autoComplete="name"
+                    value={form.name}
+                    onChange={handleChange('name')}
+                    required
+                  />
                 </span>
               </label>
             )}
@@ -99,6 +155,8 @@ export default function Auth() {
                   type="email"
                   placeholder="alex.thompson.26@dartmouth.edu"
                   autoComplete="email"
+                  value={form.email}
+                  onChange={handleChange('email')}
                   required
                 />
               </span>
@@ -112,6 +170,8 @@ export default function Auth() {
                   type={showPw ? 'text' : 'password'}
                   placeholder="••••••••"
                   autoComplete={isLogin ? 'current-password' : 'new-password'}
+                  value={form.password}
+                  onChange={handleChange('password')}
                   required
                 />
                 <button
@@ -134,15 +194,15 @@ export default function Auth() {
                 <button
                   type="button"
                   className="auth__link"
-                  onClick={() => toast('Password reset coming soon', { variant: 'info' })}
+                  onClick={() => toast.info('Password reset coming soon')}
                 >
                   Forgot password?
                 </button>
               </div>
             )}
 
-            <Button type="submit" className="btn-block auth__submit">
-              {isLogin ? 'Sign In' : 'Create Account'}
+            <Button type="submit" className="btn-block auth__submit" disabled={!isLogin && isPendingCreatingUser}>
+              {isLogin ? 'Sign In' : isPendingCreatingUser ? 'Creating Account...' : 'Create Account'}
               <ArrowRight size={16} />
             </Button>
           </form>
@@ -154,7 +214,7 @@ export default function Auth() {
           <button
             type="button"
             className="btn btn-secondary btn-block"
-            onClick={() => toast('Dartmouth NetID SSO coming soon', { variant: 'info' })}
+            onClick={() => toast.info('Dartmouth NetID SSO coming soon')}
           >
             Continue with Dartmouth NetID
           </button>
