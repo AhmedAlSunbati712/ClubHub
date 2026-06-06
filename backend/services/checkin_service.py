@@ -3,6 +3,7 @@
 # used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 from config import get_connection
 from models.enums import RSVPStatus
+from datetime import datetime
 
 # check-in lives on the RSVP row (CheckedIn + CheckInTime) per the EERD, not a separate table
 
@@ -24,6 +25,24 @@ def create_checkin(eventId, userId):
     finally:
         cursor.close()
         connection.close()
+
+
+def get_user_checkin_state(eventId, userId):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute(
+            "SELECT RSVPStatus, CheckedIn FROM RSVPs WHERE EventID = %s AND UserID = %s AND RSVPStatus != %s",
+            [eventId, userId, RSVPStatus.CANCELLED],
+        )
+        return cursor.fetchone()
+    finally:
+        cursor.close()
+        connection.close()
+
+
+def get_current_time():
+    return datetime.now()
 
 
 def delete_checkin(eventId, userId):

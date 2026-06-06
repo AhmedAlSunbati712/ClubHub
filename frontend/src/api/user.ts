@@ -40,6 +40,8 @@ type BackendUser = {
 type BackendUserRsvp = {
   EventID?: number;
   RSVPStatus?: string;
+  CheckedIn?: number | boolean;
+  CheckInTime?: string | null;
   Title?: string;
   EventDateTime?: string | null;
   Status?: string;
@@ -51,6 +53,8 @@ type BackendUserRsvp = {
 type UserRsvp = {
   eventId: number;
   rsvpStatus: string;
+  checkedIn: boolean;
+  checkInTime: string | null;
   title: string;
   eventDateTime: string | null;
   status: string;
@@ -70,6 +74,8 @@ const normalizeUser = (user: BackendUser) => ({
 const normalizeUserRsvp = (rsvp: BackendUserRsvp): UserRsvp => ({
   eventId: rsvp.EventID ?? 0,
   rsvpStatus: rsvp.RSVPStatus ?? '',
+  checkedIn: Boolean(rsvp.CheckedIn),
+  checkInTime: rsvp.CheckInTime ?? null,
   title: rsvp.Title ?? '',
   eventDateTime: rsvp.EventDateTime ?? null,
   status: rsvp.Status ?? '',

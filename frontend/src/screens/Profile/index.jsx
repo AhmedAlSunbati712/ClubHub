@@ -67,14 +67,18 @@ export default function Profile() {
   }, [userMemberships, clubsById]);
 
   const upcomingEvents = useMemo(() => {
-    return (userRsvps ?? []).map((rsvp) => ({
-      id: rsvp.eventId,
-      title: rsvp.title,
-      status: rsvp.rsvpStatus.toLowerCase(),
-      date: rsvp.eventDateTime,
-      club: rsvp.clubName,
-      location: [rsvp.building, rsvp.room].filter(Boolean).join(' '),
-    }));
+    const now = new Date();
+
+    return (userRsvps ?? [])
+      .filter((rsvp) => rsvp.eventDateTime && new Date(rsvp.eventDateTime) >= now)
+      .map((rsvp) => ({
+        id: rsvp.eventId,
+        title: rsvp.title,
+        status: rsvp.rsvpStatus.toLowerCase(),
+        date: rsvp.eventDateTime,
+        club: rsvp.clubName,
+        location: [rsvp.building, rsvp.room].filter(Boolean).join(' '),
+      }));
   }, [userRsvps]);
 
   const isLoadingProfileData =

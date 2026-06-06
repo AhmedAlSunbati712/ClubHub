@@ -51,6 +51,11 @@ const invalidateRsvpQueries = (
   if (clubId !== undefined && clubId !== null && clubId !== '') {
     queryClient.invalidateQueries({ queryKey: [CLUB_EVENTS_KEY, clubId] });
   }
+
+  queryClient.invalidateQueries({
+    predicate: (query) =>
+      Array.isArray(query.queryKey) && query.queryKey.includes(EVENT_RSVPS_KEY),
+  });
 };
 
 export function useEventRsvps(eventId: number | string | undefined) {

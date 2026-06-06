@@ -8,6 +8,12 @@ from middleware import auth
 bp = Blueprint("checkins", __name__, url_prefix="/api/events")
 
 
+@bp.post("/<int:eventId>/checkins")
+@auth.require_auth()
+def create_self_checkin(eventId: int):
+    return checkin_controller.create_self_checkin(eventId)
+
+
 @bp.post("/<int:eventId>/checkins/<int:userId>")
 @auth.require_auth()
 def create_checkin(eventId: int, userId: int):

@@ -61,9 +61,19 @@ export default function EventCard({ event, onRsvp, onCancel, onCheckIn, onWaitli
             <Button variant="danger" onClick={() => onCancel?.(event.id)}>
               Cancel
             </Button>
-            <Button className="btn-block" onClick={() => onCheckIn?.(event.id)}>
-              Check In
-            </Button>
+            {event.checkedIn ? (
+              <Button variant="success" className="btn-block" disabled>
+                Checked In
+              </Button>
+            ) : (
+              <Button
+                className="btn-block"
+                onClick={() => onCheckIn?.(event.id)}
+                disabled={event.canCheckIn === false}
+              >
+                Check In
+              </Button>
+            )}
           </>
         )}
 

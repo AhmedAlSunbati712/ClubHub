@@ -81,7 +81,8 @@ def get_rsvps(eventId):
 
 def update_rsvp(eventId, userId):
     current_user = g.current_user
-    if current_user["sub"] != userId and current_user.get("role") != UserRole.ADMIN:
+    current_user_id = int(current_user.get("sub"))
+    if current_user_id != userId and current_user.get("role") != UserRole.ADMIN:
         return jsonify({"Error": "Not authorized"}), 403
 
     try:
@@ -111,7 +112,8 @@ def update_rsvp(eventId, userId):
 
 def delete_rsvp(eventId, userId):
     current_user = g.current_user
-    if current_user["sub"] != userId and current_user.get("role") != UserRole.ADMIN:
+    current_user_id = int(current_user.get("sub"))
+    if current_user_id != userId and current_user.get("role") != UserRole.ADMIN:
         return jsonify({"Error": "Not authorized"}), 403
 
     existing = rsvp_service.get_rsvp(eventId, userId)

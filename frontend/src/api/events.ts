@@ -5,6 +5,7 @@ export { useEventRsvps, useCreateRsvp, useUpdateRsvp, useDeleteRsvp } from './rs
 const EVENTS_KEY = 'events';
 const EVENT_CHECKINS_KEY = 'event-checkins';
 const CLUB_EVENTS_KEY = 'club-events';
+const USER_RSVPS_KEY = 'event-rsvps';
 
 export interface Event {
   id: number;
@@ -108,6 +109,13 @@ const invalidateEventQueries = (
   if (clubId !== undefined && clubId !== null && clubId !== '') {
     queryClient.invalidateQueries({ queryKey: [CLUB_EVENTS_KEY, clubId] });
   }
+};
+
+const invalidateUserRsvpQueries = (queryClient: ReturnType<typeof useQueryClient>) => {
+  queryClient.invalidateQueries({
+    predicate: (query) =>
+      Array.isArray(query.queryKey) && query.queryKey.includes(USER_RSVPS_KEY),
+  });
 };
 
 export function useEvents(query?: EventListQuery) {
@@ -239,6 +247,28 @@ export function useUndoCheckIn(onSuccess?: () => void) {
     },
     onSuccess: ({ eventId, clubId }) => {
       invalidateEventQueries(queryClient, eventId, clubId);
+      onSuccess?.();
+    },
+  });
+}
+
+export function useSelfCheckIn(onSuccess?: () => void) {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      eventId,
+      clubId,
+    }: {
+      eventId: number | string;
+      clubId?: number | string | null;
+    }) => {
+      const response = await api.post(`/api/events/${eventId}/checkins`);
+      return { data: response.data, eventId, clubId };
+    },
+    onSuccess: ({ eventId, clubId }) => {
+      invalidateEventQueries(queryClient, eventId, clubId);
+      invalidateUserRsvpQueries(queryClient);
       onSuccess?.();
     },
   });

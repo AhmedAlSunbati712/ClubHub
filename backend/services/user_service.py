@@ -1,6 +1,5 @@
 from config import get_connection
 from .auth_service import hash_password
-from datetime import datetime
 
 
 def create_user(name, email, role, password):
@@ -149,6 +148,8 @@ def get_user_rsvps(userId: int):
               SELECT
                 RSVPs.EventID,
                 RSVPs.RSVPStatus,
+                RSVPs.CheckedIn,
+                RSVPs.CheckInTime,
                 Events.Title,
                 Events.EventDateTime,
                 Events.Status,
@@ -160,10 +161,9 @@ def get_user_rsvps(userId: int):
               JOIN Clubs ON Events.ClubID = Clubs.ClubID
               JOIN Locations ON Events.LocationID = Locations.LocationID
               WHERE RSVPs.UserID = %s
-              AND Events.EventDateTime >= %s
               AND Events.Status NOT IN ('Cancelled', 'Completed')
             """
-            cursor.execute(query, [userId, datetime.now()])
+            cursor.execute(query, [userId])
             user_rsvps = cursor.fetchall()
             return user_rsvps, len(user_rsvps)
     except Exception as e:
