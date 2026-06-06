@@ -20,7 +20,7 @@ def verify_password(plaintext_pw, plaintext_hashed_pw):
 def create_token(user):
     now = datetime.now(timezone.utc)
     payload = {
-        "sub": user["UserID"],
+        "sub": str(user["UserID"]),
         "role": user["Role"],
         "iat": now,
         "exp": now + timedelta(hours=ENV.JWT_EXPIRY_HOURS),
