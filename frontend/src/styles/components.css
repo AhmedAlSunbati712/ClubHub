@@ -86,6 +86,14 @@
 .navbar__user:hover {
   background: var(--green-50);
 }
+.navbar__user-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+.navbar__logout {
+  white-space: nowrap;
+}
 .navbar__user-meta {
   display: flex;
   flex-direction: column;

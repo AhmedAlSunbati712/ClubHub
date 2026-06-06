@@ -1,4 +1,4 @@
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { CalendarDays, Users, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Avatar from './Avatar.jsx';
@@ -13,7 +13,8 @@ const TABS = [
 
 // DartClubs logo + Events/Clubs/Admin tabs + user badge.
 export default function Navbar() {
-  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   return (
     <nav className="navbar">
@@ -44,13 +45,25 @@ export default function Navbar() {
         <span className="navbar__spacer" />
 
         {user && (
-          <Link to={ROUTES.PROFILE} className="navbar__user" aria-label="View your profile">
-            <span className="navbar__user-meta">
-              <span className="navbar__user-name">{user.name}</span>
-              <RoleBadge role={user.role} />
-            </span>
-            <Avatar name={user.name} size="md" />
-          </Link>
+          <div className="navbar__user-actions">
+            <Link to={ROUTES.PROFILE} className="navbar__user" aria-label="View your profile">
+              <span className="navbar__user-meta">
+                <span className="navbar__user-name">{user.name}</span>
+                <RoleBadge role={user.role} />
+              </span>
+              <Avatar name={user.name} size="md" />
+            </Link>
+            <button
+              type="button"
+              className="btn btn-secondary btn-sm navbar__logout"
+              onClick={() => {
+                logout();
+                navigate(ROUTES.LOGIN);
+              }}
+            >
+              Sign Out
+            </button>
+          </div>
         )}
       </div>
 
