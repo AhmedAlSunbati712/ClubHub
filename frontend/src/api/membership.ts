@@ -1,8 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from './axios';
 
-const CLUB_MEMBERSHIPS_KEY = 'club-memberships';
-const USER_MEMBERSHIPS_KEY = 'user-memberships';
+export const CLUB_MEMBERSHIPS_KEY = 'club-memberships';
+export const USER_MEMBERSHIPS_KEY = 'user-memberships';
 
 export interface Membership {
   userId: number;
@@ -65,6 +65,7 @@ export function useCreateMembership(onSuccess?: () => void) {
     },
     onSuccess: ({ clubId }) => {
       queryClient.invalidateQueries({ queryKey: [CLUB_MEMBERSHIPS_KEY, clubId] });
+      queryClient.invalidateQueries({ queryKey: [USER_MEMBERSHIPS_KEY] });
       onSuccess?.();
     },
   });
