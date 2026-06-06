@@ -5,7 +5,7 @@ import { SearchX } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext.jsx';
 import api from '../../api/axios.ts';
-import { CLUBS_KEY, useClubs } from '../../api/clubs.ts';
+import { useClubs } from '../../api/clubs.ts';
 import {
   CLUB_MEMBERSHIPS_KEY,
   useCreateMembership,
@@ -33,7 +33,7 @@ export default function Clubs() {
     data: userMemberships,
     isLoading: isLoadingUserMemberships,
   } = useUserMemberships(user?.id);
-  const { mutate: createMembership, isPending: isPendingCreateMembership } = useCreateMembership();
+  const { mutate: createMembership } = useCreateMembership();
 
   const filteredClubs = useMemo(() => {
     return (clubs ?? []).filter((club) => {
