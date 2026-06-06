@@ -9,10 +9,10 @@ from models.enums import EventStatus
 
 class CreateEventSchema(BaseModel):
     clubId: int
-    locationId: Optional[int] = None
+    locationId: int
     title: str
     eventDateTime: datetime
-    eventCapacity: Optional[int] = None
+    eventCapacity: int
 
 
 class UpdateEventSchema(BaseModel):

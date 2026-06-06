@@ -25,10 +25,10 @@ export interface EventListQuery {
 
 export interface CreateEventPayload {
   clubId: number;
-  locationId?: number | null;
+  locationId: number;
   title: string;
   eventDateTime: string;
-  eventCapacity?: number | null;
+  eventCapacity: number;
 }
 
 export interface UpdateEventPayload {

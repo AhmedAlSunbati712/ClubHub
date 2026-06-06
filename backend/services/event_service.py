@@ -36,7 +36,7 @@ def get_location_capacity(locationId):
         connection.close()
 
 
-def create_event(clubId, title, eventDateTime, locationId=None, eventCapacity=None):
+def create_event(clubId, title, eventDateTime, locationId, eventCapacity):
     connection = get_connection()
     cursor = connection.cursor()
     try:

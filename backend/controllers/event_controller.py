@@ -28,17 +28,15 @@ def create_event():
         return jsonify({"Error": "Only officers or admins can create events"}), 403
 
     # enforce event capacity <= location capacity
-    if body.eventCapacity is not None and body.locationId is not None:
+    try:
         loc_capacity = event_service.get_location_capacity(body.locationId)
-        if loc_capacity is not None and body.eventCapacity > loc_capacity:
-            return (
-                jsonify(
-                    {
-                        "Error": f"Event capacity ({body.eventCapacity}) exceeds location capacity ({loc_capacity})"
-                    }
-                ),
-                400,
-            )
+        if loc_capacity is None:
+            return jsonify({"Error": f"No location with id {body.locationId} exists"}), 400
+        if body.eventCapacity > loc_capacity:
+            return jsonify({"Error": f"Event capacity ({body.eventCapacity}) exceeds location capacity ({loc_capacity})"}), 400
+    except Exception as e:
+        return jsonify({"Error": f"Failed to validate location capacity: {e}"}), 500
+
 
     try:
         eventId = event_service.create_event(
@@ -92,25 +90,25 @@ def update_event(eventId):
 
     # re-validate capacity against location (use updated values if provided, else existing)
     check_capacity = (
-        body.eventCapacity
+        body.eventCapacity # If the user wants to modify the capacity of the given event
         if body.eventCapacity is not None
-        else event.get("EventCapacity")
+        else event.get("EventCapacity") # otherwise use the original  capacity
     )
+    
     check_location = (
         body.locationId if body.locationId is not None else event.get("LocationID")
     )
+    
     if check_capacity is not None and check_location is not None:
-        loc_capacity = event_service.get_location_capacity(check_location)
-        if loc_capacity is not None and check_capacity > loc_capacity:
-            return (
-                jsonify(
-                    {
-                        "Error": f"Event capacity ({check_capacity}) exceeds location capacity ({loc_capacity})"
-                    }
-                ),
-                400,
-            )
-
+        try:
+            loc_capacity = event_service.get_location_capacity(check_location)
+            if loc_capacity is None:
+                return jsonify({"Error": f"No location with id {check_location} exists"}), 400
+            if check_capacity > loc_capacity:
+                return jsonify({"Error": f"Event capacity ({check_capacity}) exceeds location capacity ({loc_capacity})"}), 400
+        except Exception as e:
+            return jsonify({"Error": f"Failed to validate capacity of location {check_location} for event {eventId}"}), 400
+        
     try:
         rowcount = event_service.update_event(
             eventId,
