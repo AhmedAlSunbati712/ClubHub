@@ -1,5 +1,6 @@
 from config import get_connection
 from .auth_service import hash_password
+from datetime import datetime
 
 
 def create_user(name, email, role, password):
@@ -133,6 +134,39 @@ def delete_user(userId):
         return cursor.rowcount
     except Exception as e:
         connection.rollback()
+        raise e
+    finally:
+        cursor.close()
+        connection.close()
+
+
+def get_user_rsvps(userId: int):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary = True)
+    
+    try:
+            query = """
+              SELECT
+                RSVPs.EventID,
+                RSVPs.RSVPStatus,
+                Events.Title,
+                Events.EventDateTime,
+                Events.Status,
+                Clubs.ClubName,
+                Locations.Building,
+                Locations.Room
+              FROM RSVPs
+              JOIN Events ON RSVPs.EventID = Events.EventID
+              JOIN Clubs ON Events.ClubID = Clubs.ClubID
+              JOIN Locations ON Events.LocationID = Locations.LocationID
+              WHERE RSVPs.UserID = %s
+              AND Events.EventDateTime >= %s
+              AND Events.Status NOT IN ('Cancelled', 'Completed')
+            """
+            cursor.execute(query, [userId, datetime.now()])
+            user_rsvps = cursor.fetchall()
+            return user_rsvps, len(user_rsvps)
+    except Exception as e:
         raise e
     finally:
         cursor.close()

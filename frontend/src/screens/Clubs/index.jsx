@@ -7,7 +7,6 @@ import ClubCard from '../../components/clubs/ClubCard.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
 import { clubCategories } from '../../data/fixtures.js';
 
-// Image 6 — Browse Clubs.
 export default function Clubs() {
   const { clubs } = useClubs();
   const { toast } = useToast();

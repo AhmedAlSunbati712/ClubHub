@@ -9,6 +9,10 @@ bp = Blueprint("users", __name__, url_prefix="/api/users")
 def create_user():
     return user_controller.create_user()
 
+@bp.get("/<int:userId>/rsvps")
+@auth.require_auth()
+def get_user_rsvps(userId: int):
+    return user_controller.get_user_rsvps(userId)
 
 @bp.get("/<int:userId>")
 @auth.require_auth()

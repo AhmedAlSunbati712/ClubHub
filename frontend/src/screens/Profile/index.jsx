@@ -1,4 +1,5 @@
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { useMemo } from 'react';
 import { Mail, Users, Clock, CalendarDays, Award, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
 import Avatar from '../../components/common/Avatar.jsx';
@@ -7,13 +8,98 @@ import StatCard from '../../components/common/StatCard.jsx';
 import EventListItem from '../../components/events/EventListItem.jsx';
 import { formatDate } from '../../utils/format.js';
 import { ROUTES } from '../../constants/routes.js';
+import { useUserMemberships } from '../../api/membership.ts';
+import { useUserRsvps } from '../../api/user.ts';
+import { CLUBS_KEY } from '../../api/clubs.ts';
+import { useQueries } from '@tanstack/react-query';
+import api from '../../api/axios.ts';
 
-// Image 3 — My Profile.
 export default function Profile() {
-  const { user } = useAuth();
   const navigate = useNavigate();
-  if (!user) return null;
-  const qs = user.quickStats ?? {};
+  const { user, logout } = useAuth();
+  const userId = user?.id;
+
+  const {
+    data: userMemberships,
+    isLoading: isLoadingUserMemberships,
+    isError: isErrorUserMemberships,
+  } = useUserMemberships(userId);
+
+  const clubIds = userMemberships?.map((membership) => membership.clubId) ?? [];
+  const {
+    data: userRsvps,
+    isLoading: isLoadingUserRsvps,
+    isError: isErrorUserRsvps,
+  } = useUserRsvps(userId);
+
+  const clubsQuery = useQueries({
+    queries: clubIds.map((id) => ({
+      queryKey: [CLUBS_KEY, id],
+      queryFn: async () => {
+        const response = await api.get(`/api/clubs/${id}`);
+        return {
+          id: response.data.ClubID,
+          name: response.data.ClubName,
+          category: response.data.Category,
+        };
+      },
+      enabled: Boolean(userId),
+    })),
+  });
+
+  const clubsById = useMemo(() => {
+    return Object.fromEntries(
+      clubsQuery
+        .filter((query) => query.data)
+        .map((query) => [query.data.id, query.data]),
+    );
+  }, [clubsQuery]);
+
+  const myClubs = useMemo(() => {
+    return (userMemberships ?? []).map((membership) => ({
+      id: membership.clubId,
+      role: membership.role,
+      joinDate: membership.joinDate,
+      status: membership.status,
+      name: clubsById[membership.clubId]?.name ?? '',
+      category: clubsById[membership.clubId]?.category ?? '',
+    }));
+  }, [userMemberships, clubsById]);
+
+  const upcomingEvents = useMemo(() => {
+    return (userRsvps ?? []).map((rsvp) => ({
+      id: rsvp.eventId,
+      title: rsvp.title,
+      status: rsvp.rsvpStatus.toLowerCase(),
+      date: rsvp.eventDateTime,
+      club: rsvp.clubName,
+      location: [rsvp.building, rsvp.room].filter(Boolean).join(' '),
+    }));
+  }, [userRsvps]);
+
+  const isLoadingProfileData =
+    isLoadingUserMemberships ||
+    isLoadingUserRsvps ||
+    clubsQuery.some((query) => query.isLoading);
+
+  const qs = useMemo(() => ({
+    activeClubs: myClubs.filter((club) => club.status === 'Active').length,
+    pendingApplications: myClubs.filter((club) => club.status === 'Pending').length,
+    upcomingEvents: upcomingEvents.length,
+    officerRoles: myClubs.filter((club) => club.role === 'Officer' || club.role === 'President').length,
+  }), [myClubs, upcomingEvents]);
+
+  if (!user) {
+    return <Navigate to={ROUTES.LOGIN} replace />;
+  }
+
+  if (isLoadingProfileData) {
+    return <div>Loading...</div>;
+  }
+
+  if (isErrorUserMemberships || isErrorUserRsvps) {
+    return <div>Error fetching profile data</div>;
+  }
 
   return (
     <div className="container page">
@@ -38,7 +124,10 @@ export default function Profile() {
               type="button"
               className="btn btn-secondary btn-block"
               style={{ marginTop: 'var(--space-4)' }}
-              onClick={() => navigate(ROUTES.LOGIN)}
+              onClick={() => {
+                logout();
+                navigate(ROUTES.LOGIN);
+              }}
             >
               <LogOut size={16} />
               Sign Out
@@ -73,7 +162,7 @@ export default function Profile() {
             <h2 className="section-title" style={{ marginBottom: 'var(--space-3)' }}>
               My Clubs
             </h2>
-            {(user.myClubs ?? []).map((club) => {
+            {myClubs.map((club) => {
               const canManage = club.role === 'Officer' || club.role === 'President';
               return (
                 <div className="my-club-row" key={club.id}>
@@ -114,7 +203,7 @@ export default function Profile() {
               Upcoming Events
             </h2>
             <ul style={{ listStyle: 'none', padding: 0 }}>
-              {(user.upcomingEvents ?? []).map((event) => (
+              {upcomingEvents.map((event) => (
                 <EventListItem key={event.id} event={event} />
               ))}
             </ul>

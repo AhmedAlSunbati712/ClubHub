@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from './axios';
 
-const CLUBS_KEY = 'clubs';
+export const CLUBS_KEY = 'clubs';
 
 export interface Club {
   id: number;

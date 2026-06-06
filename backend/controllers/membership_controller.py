@@ -56,7 +56,7 @@ def get_club_memberships(clubId):
         return jsonify({"Error": f"Failed to get memberships: {e}"}), 500
 
 
-def get_user_memberships(userId):
+def get_memberships_by_user(userId):
     try:
         memberships = membership_service.get_memberships_by_user(userId)
         return jsonify(memberships), 200

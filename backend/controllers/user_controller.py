@@ -30,7 +30,8 @@ def create_user():
 
 def get_user_by_id(userId: int):
     current_user = g.current_user
-    if current_user.get("sub") != userId and current_user.get("role") != UserRole.ADMIN:
+    current_user_id = int(current_user.get("sub"))
+    if current_user_id != userId and current_user.get("role") != UserRole.ADMIN:
         return jsonify({"Error": "Action is not authorized"}), 403
 
     try:
@@ -59,7 +60,8 @@ def get_users():
 
 def update_user(userId: int):
     current_user = g.current_user
-    if current_user.get("sub") != userId and current_user.get("role") != UserRole.ADMIN:
+    current_user_id = int(current_user.get("sub"))
+    if current_user_id != userId and current_user.get("role") != UserRole.ADMIN:
         return jsonify({"Error": "Action is not authorized"}), 403
     try:
         body = UpdateUserSchema(**request.get_json())
@@ -88,7 +90,8 @@ def update_user(userId: int):
 
 def delete_user(userId: int):
     current_user = g.current_user
-    if current_user.get("sub") != userId and current_user.get("role") != UserRole.ADMIN:
+    current_user_id = int(current_user.get("sub"))
+    if current_user_id != userId and current_user.get("role") != UserRole.ADMIN:
         return jsonify({"Error": "Action is not Authorized"}), 403
     try:
         rowcount = user_service.delete_user(userId)
@@ -97,3 +100,17 @@ def delete_user(userId: int):
         return jsonify({"message": "Success"}), 200
     except Exception as e:
         return jsonify({"Error": f"Failed to delete user {userId}: {e}"}), 500
+
+
+def get_user_rsvps(userId: int):
+    current_user = g.current_user
+    current_user_id = int(current_user.get("sub"))
+    if current_user_id != userId and current_user.get("role") != UserRole.ADMIN:
+        return jsonify({"Error": "Action is not Authroized"}), 403
+    try:
+        user_rsvps, rowcount = user_service.get_user_rsvps(userId);
+        if rowcount == 0:
+            return jsonify([]), 200
+        return jsonify(user_rsvps), 200
+    except Exception as e:
+        return jsonify({"Error": f"Failed to get rsvps for user {userId}: {e}"}), 500

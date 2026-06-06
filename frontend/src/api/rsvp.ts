@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from './axios';
 
-const EVENTS_KEY = 'events';
-const CLUB_EVENTS_KEY = 'club-events';
-const EVENT_RSVPS_KEY = 'event-rsvps';
+export const EVENTS_KEY = 'events';
+export const CLUB_EVENTS_KEY = 'club-events';
+export const EVENT_RSVPS_KEY = 'event-rsvps';
 
 export interface Rsvp {
   userId: number;

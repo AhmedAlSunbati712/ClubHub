@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from './axios';
 import { UserRole } from '../types/user';
+import { EVENT_RSVPS_KEY } from './rsvp';
 
 const USERS_KEY = 'users';
 
@@ -36,6 +37,28 @@ type BackendUser = {
   role?: UserRole;
 };
 
+type BackendUserRsvp = {
+  EventID?: number;
+  RSVPStatus?: string;
+  Title?: string;
+  EventDateTime?: string | null;
+  Status?: string;
+  ClubName?: string;
+  Building?: string;
+  Room?: string;
+};
+
+type UserRsvp = {
+  eventId: number;
+  rsvpStatus: string;
+  title: string;
+  eventDateTime: string | null;
+  status: string;
+  clubName: string;
+  building: string;
+  room: string;
+};
+
 // the backend return UserID, frontend expects userId. annoying mismatches so im just gonna handle it with this
 const normalizeUser = (user: BackendUser) => ({
   id: user.UserID ?? user.userId ?? 0,
@@ -43,6 +66,28 @@ const normalizeUser = (user: BackendUser) => ({
   email: user.Email ?? user.email ?? '',
   role: user.Role ?? user.role ?? UserRole.STUDENT,
 });
+
+const normalizeUserRsvp = (rsvp: BackendUserRsvp): UserRsvp => ({
+  eventId: rsvp.EventID ?? 0,
+  rsvpStatus: rsvp.RSVPStatus ?? '',
+  title: rsvp.Title ?? '',
+  eventDateTime: rsvp.EventDateTime ?? null,
+  status: rsvp.Status ?? '',
+  clubName: rsvp.ClubName ?? '',
+  building: rsvp.Building ?? '',
+  room: rsvp.Room ?? '',
+});
+
+export const useUserRsvps = (userId: number | string | undefined) => {
+  return useQuery({
+    queryKey: [USERS_KEY, EVENT_RSVPS_KEY, userId],
+    queryFn: async () => {
+      const response = await api.get(`/api/users/${userId}/rsvps`);
+      return response.data.map(normalizeUserRsvp);
+    },
+    enabled: userId !== undefined && userId !== null && userId !== '',
+  });
+};
 
 export const useCreateUser = (onSuccess?: () => void) => {
   const queryClient = useQueryClient();
