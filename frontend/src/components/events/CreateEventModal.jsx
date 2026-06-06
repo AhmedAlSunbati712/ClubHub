@@ -1,9 +1,10 @@
 import { useMemo, useState } from 'react';
 import { Type, CalendarClock, MapPin, Users, AlignLeft, ChevronDown } from 'lucide-react';
+import { toast } from 'react-toastify';
 import Modal from '../common/Modal.jsx';
 import Button from '../common/Button.jsx';
-import { useToast } from '../../context/ToastContext.jsx';
-import { locationRows } from '../../data/fixtures.js';
+import { useCreateEvent } from '../../api/events.ts';
+import { useLocations } from '../../api/locations.ts';
 
 /**
  * Create Event form.
@@ -27,10 +28,14 @@ const EMPTY = {
 };
 
 export default function CreateEventModal({ open, onClose, clubs = [], defaultClubId = '' }) {
-  const { toast } = useToast();
   const [form, setForm] = useState({ ...EMPTY, clubId: defaultClubId });
   const [errors, setErrors] = useState({});
   const lockClub = clubs.length === 1;
+  const { data: locations } = useLocations();
+  const { mutate: createEvent, isPending: isPendingCreateEvent } = useCreateEvent(() => {
+    toast.success(`Event “${form.title.trim()}” created`);
+    close();
+  });
 
   // local datetime string for the <input min>
   const nowLocal = useMemo(() => {
@@ -46,7 +51,7 @@ export default function CreateEventModal({ open, onClose, clubs = [], defaultClu
   };
 
   const onLocation = (id) => {
-    const room = locationRows.find((l) => l.id === id);
+    const room = (locations ?? []).find((location) => String(location.id) === id);
     setForm((f) => ({
       ...f,
       locationId: id,
@@ -58,7 +63,7 @@ export default function CreateEventModal({ open, onClose, clubs = [], defaultClu
 
   const validate = () => {
     const next = {};
-    const room = locationRows.find((l) => l.id === form.locationId);
+    const room = (locations ?? []).find((location) => String(location.id) === form.locationId);
     if (!form.title.trim()) next.title = 'Title is required';
     if (!form.clubId) next.clubId = 'Select a host club';
     if (!form.startTime) next.startTime = 'Pick a date and time';
@@ -82,11 +87,28 @@ export default function CreateEventModal({ open, onClose, clubs = [], defaultClu
   const submit = (e) => {
     e.preventDefault();
     if (!validate()) return;
-    toast(`Event “${form.title.trim()}” created`);
-    close();
+    createEvent(
+      {
+        clubId: Number(form.clubId),
+        locationId: Number(form.locationId),
+        title: form.title.trim(),
+        description: form.description.trim(),
+        eventDateTime: form.startTime,
+        eventCapacity: Number(form.capacity),
+      },
+      {
+        onError: (error) => {
+          const message =
+            error?.response?.data?.Error ||
+            error?.response?.data?.errors?.[0]?.msg ||
+            'Failed to create event';
+          toast.error(message);
+        },
+      },
+    );
   };
 
-  const room = locationRows.find((l) => l.id === form.locationId);
+  const room = (locations ?? []).find((location) => String(location.id) === form.locationId);
 
   return (
     <Modal open={open} onClose={close} title="Create Event" labelledBy="create-event-title">
@@ -168,7 +190,7 @@ export default function CreateEventModal({ open, onClose, clubs = [], defaultClu
             <MapPin className="field__icon" size={17} />
             <select value={form.locationId} onChange={(e) => onLocation(e.target.value)}>
               <option value="">Select a location…</option>
-              {locationRows.map((l) => (
+              {(locations ?? []).map((l) => (
                 <option key={l.id} value={l.id}>
                   {l.building} — {l.room} ({l.capacity} seats)
                 </option>
@@ -197,7 +219,9 @@ export default function CreateEventModal({ open, onClose, clubs = [], defaultClu
           <Button variant="secondary" onClick={close}>
             Cancel
           </Button>
-          <Button type="submit">Create Event</Button>
+          <Button type="submit" disabled={isPendingCreateEvent}>
+            {isPendingCreateEvent ? 'Creating...' : 'Create Event'}
+          </Button>
         </div>
       </form>
     </Modal>

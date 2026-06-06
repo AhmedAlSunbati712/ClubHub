@@ -11,6 +11,7 @@ class CreateEventSchema(BaseModel):
     clubId: int
     locationId: int
     title: str
+    description: str
     eventDateTime: datetime
     eventCapacity: int
 
@@ -18,6 +19,7 @@ class CreateEventSchema(BaseModel):
 class UpdateEventSchema(BaseModel):
     locationId: Optional[int] = None
     title: Optional[str] = None
+    description: Optional[str] = None
     eventDateTime: Optional[datetime] = None
     eventCapacity: Optional[int] = None
     status: Optional[EventStatus] = None

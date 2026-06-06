@@ -17,6 +17,10 @@ export interface UpdateMembershipPayload {
   status?: string;
 }
 
+interface BackendMembershipCount {
+  memberships_count?: number;
+}
+
 interface BackendMembership {
   UserID?: number;
   ClubID?: number;
@@ -52,6 +56,17 @@ export function useUserMemberships(userId: number | string | undefined) {
       return (response.data as BackendMembership[]).map(normalizeMembership);
     },
     enabled: userId !== undefined && userId !== null && userId !== '',
+  });
+}
+
+export function useMembershipCount(clubId: number | string | undefined) {
+  return useQuery({
+    queryKey: [CLUB_MEMBERSHIPS_KEY, 'count', clubId],
+    queryFn: async () => {
+      const response = await api.get(`/api/memberships/${clubId}`);
+      return (response.data as BackendMembershipCount).memberships_count ?? 0;
+    },
+    enabled: clubId !== undefined && clubId !== null && clubId !== '',
   });
 }
 

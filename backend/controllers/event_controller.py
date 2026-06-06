@@ -42,6 +42,7 @@ def create_event():
         eventId = event_service.create_event(
             clubId=body.clubId,
             title=body.title,
+            description=body.description,
             eventDateTime=body.eventDateTime,
             locationId=body.locationId,
             eventCapacity=body.eventCapacity,
@@ -114,6 +115,7 @@ def update_event(eventId):
             eventId,
             locationId=body.locationId,
             title=body.title,
+            description=body.description,
             eventDateTime=body.eventDateTime,
             eventCapacity=body.eventCapacity,
             status=body.status,

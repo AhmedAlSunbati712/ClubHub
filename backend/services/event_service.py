@@ -36,13 +36,13 @@ def get_location_capacity(locationId):
         connection.close()
 
 
-def create_event(clubId, title, eventDateTime, locationId, eventCapacity):
+def create_event(clubId, title, description, eventDateTime, locationId, eventCapacity):
     connection = get_connection()
     cursor = connection.cursor()
     try:
         cursor.execute(
-            "INSERT INTO Events (ClubID, LocationID, Title, EventDateTime, EventCapacity, ConfirmedCount) VALUES (%s, %s, %s, %s, %s, 0)",
-            [clubId, locationId, title, eventDateTime, eventCapacity],
+            "INSERT INTO Events (ClubID, LocationID, Title, Description, EventDateTime, EventCapacity, ConfirmedCount) VALUES (%s, %s, %s, %s, %s, %s, 0)",
+            [clubId, locationId, title, description, eventDateTime, eventCapacity],
         )
         connection.commit()
         return cursor.lastrowid
@@ -58,7 +58,18 @@ def get_event_by_id(eventId):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT * FROM Events WHERE EventID = %s", [eventId])
+        cursor.execute(
+            """
+            SELECT
+                Events.*,
+                Locations.Building,
+                Locations.Room
+            FROM Events
+            JOIN Locations ON Events.LocationID = Locations.LocationID
+            WHERE Events.EventID = %s
+            """,
+            [eventId],
+        )
         return cursor.fetchone()
     finally:
         cursor.close()
@@ -69,16 +80,24 @@ def get_events(clubId=None, status=None, title=None):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
-        query = "SELECT * FROM Events WHERE 1=1"
+        query = """
+            SELECT
+                Events.*,
+                Locations.Building,
+                Locations.Room
+            FROM Events
+            JOIN Locations ON Events.LocationID = Locations.LocationID
+            WHERE 1=1
+        """
         params = []
         if clubId is not None:
-            query += " AND ClubID = %s"
+            query += " AND Events.ClubID = %s"
             params.append(clubId)
         if status:
-            query += " AND Status = %s"
+            query += " AND Events.Status = %s"
             params.append(status)
         if title:
-            query += " AND Title LIKE %s"
+            query += " AND Events.Title LIKE %s"
             params.append(f"%{title}%")
         cursor.execute(query, params)
         return cursor.fetchall()
@@ -91,6 +110,7 @@ def update_event(
     eventId,
     locationId=None,
     title=None,
+    description=None,
     eventDateTime=None,
     eventCapacity=None,
     status=None,
@@ -104,6 +124,9 @@ def update_event(
     if title is not None:
         fields.append("Title = %s")
         params.append(title)
+    if description is not None:
+        fields.append("Description = %s")
+        params.append(description)
     if eventDateTime is not None:
         fields.append("EventDateTime = %s")
         params.append(eventDateTime)

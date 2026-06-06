@@ -122,3 +122,16 @@ def delete_membership(userId, clubId):
     finally:
         cursor.close()
         connection.close()
+
+def get_memberships_count(clubId: int):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary = True)
+    try:
+        query = "SELECT Count(*) as memberships_count FROM Memberships WHERE ClubId = %s"
+        cursor.execute(query, [clubId])
+        return cursor.fetchone()
+    except Exception as e:
+        raise e
+    finally:
+        cursor.close()
+        connection.close()

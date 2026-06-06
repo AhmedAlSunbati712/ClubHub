@@ -43,3 +43,8 @@ def update_membership(clubId: int, userId: int):
 @auth.require_auth()
 def delete_membership(clubId: int, userId: int):
     return membership_controller.delete_membership(clubId, userId)
+
+
+@bp.get("/api/memberships/<int:clubId>")
+def get_memberships_count(clubId: int):
+    return membership_controller.get_club_memberships_count(clubId)

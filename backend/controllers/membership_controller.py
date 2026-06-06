@@ -5,7 +5,7 @@
 from flask import g, request, jsonify
 from pydantic import ValidationError
 from schemas import UpdateMembershipSchema
-from services import membership_service
+from services import membership_service, club_service
 from models.enums import MembershipStatus, UserRole, ClubRole
 
 
@@ -48,7 +48,7 @@ def get_membership(userId, clubId):
         return jsonify({"Error": f"Failed to get membership: {e}"}), 500
 
 
-def get_club_memberships(clubId):
+def get_memberships_by_club(clubId):
     try:
         memberships = membership_service.get_memberships_by_club(clubId)
         return jsonify(memberships), 200
@@ -124,3 +124,16 @@ def delete_membership(clubId, userId):
         return jsonify({"message": "Success"}), 200
     except Exception as e:
         return jsonify({"Error": f"Failed to delete membership: {e}"}), 500
+
+
+def get_club_memberships_count(clubId: int):
+    try:
+        # make sure the club exists
+        club = club_service.get_club(clubId)
+        if club is None:
+            return jsonify({"Error": f"Club with {clubId} Id doesn't exist!"}), 404
+
+        memberships_count = membership_service.get_memberships_count(clubId)
+        return jsonify(memberships_count), 200
+    except Exception as e:
+        return jsonify({"Error": f"Failed to fetch memberships count for club {clubId}"}), 500

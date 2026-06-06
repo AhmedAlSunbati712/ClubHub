@@ -11,10 +11,13 @@ export interface Event {
   clubId: number | null;
   locationId: number | null;
   title: string;
+  description: string;
   date: string | null;
   capacity: number | null;
   confirmedCount: number;
   status: string;
+  building: string;
+  room: string;
 }
 
 export interface EventListQuery {
@@ -27,6 +30,7 @@ export interface CreateEventPayload {
   clubId: number;
   locationId: number;
   title: string;
+  description: string;
   eventDateTime: string;
   eventCapacity: number;
 }
@@ -34,6 +38,7 @@ export interface CreateEventPayload {
 export interface UpdateEventPayload {
   locationId?: number | null;
   title?: string;
+  description?: string;
   eventDateTime?: string;
   eventCapacity?: number | null;
   status?: string;
@@ -51,10 +56,13 @@ interface BackendEvent {
   ClubID?: number | null;
   LocationID?: number | null;
   Title?: string;
+  Description?: string;
   EventDateTime?: string | null;
   EventCapacity?: number | null;
   ConfirmedCount?: number;
   Status?: string;
+  Building?: string;
+  Room?: string;
 }
 
 interface BackendCheckin {
@@ -69,10 +77,13 @@ const normalizeEvent = (event: BackendEvent): Event => ({
   clubId: event.ClubID ?? null,
   locationId: event.LocationID ?? null,
   title: event.Title ?? '',
+  description: event.Description ?? '',
   date: event.EventDateTime ?? null,
   capacity: event.EventCapacity ?? null,
   confirmedCount: event.ConfirmedCount ?? 0,
   status: event.Status ?? '',
+  building: event.Building ?? '',
+  room: event.Room ?? '',
 });
 
 const normalizeCheckin = (checkin: BackendCheckin): Checkin => ({

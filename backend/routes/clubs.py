@@ -35,3 +35,8 @@ def update_club(clubId: int):
 @auth.require_auth()
 def delete_club(clubId: int):
     return club_controller.delete_club(clubId)
+
+@bp.get("/<int:clubId>/officers")
+def get_club_officers(clubId: int):
+    return club_controller.get_club_officers(clubId)
+    

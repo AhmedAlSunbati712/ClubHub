@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from './axios';
 
 export const CLUBS_KEY = 'clubs';
+export const CLUB_OFFICERS_KEY = 'club-officers';
 
 export interface Club {
   id: number;
@@ -9,6 +10,12 @@ export interface Club {
   category: string;
   description: string;
   status: string;
+}
+
+export interface ClubOfficer {
+  id: number;
+  name: string;
+  role: string;
 }
 
 export interface ClubListQuery {
@@ -38,12 +45,24 @@ interface BackendClub {
   Status?: string;
 }
 
+interface BackendClubOfficer {
+  UserID?: number;
+  Name?: string;
+  Role?: string;
+}
+
 const normalizeClub = (club: BackendClub): Club => ({
   id: club.ClubID ?? 0,
   name: club.ClubName ?? '',
   category: club.Category ?? '',
   description: club.Description ?? '',
   status: club.Status ?? '',
+});
+
+const normalizeClubOfficer = (officer: BackendClubOfficer): ClubOfficer => ({
+  id: officer.UserID ?? 0,
+  name: officer.Name ?? '',
+  role: officer.Role ?? '',
 });
 
 export function useClubs(query?: ClubListQuery) {
@@ -62,6 +81,17 @@ export function useClub(clubId: number | string | undefined) {
     queryFn: async () => {
       const response = await api.get(`/api/clubs/${clubId}`);
       return normalizeClub(response.data as BackendClub);
+    },
+    enabled: clubId !== undefined && clubId !== null && clubId !== '',
+  });
+}
+
+export function useClubOfficers(clubId: number | string | undefined) {
+  return useQuery({
+    queryKey: [CLUB_OFFICERS_KEY, clubId],
+    queryFn: async () => {
+      const response = await api.get(`/api/clubs/${clubId}/officers`);
+      return (response.data as BackendClubOfficer[]).map(normalizeClubOfficer);
     },
     enabled: clubId !== undefined && clubId !== null && clubId !== '',
   });

@@ -122,3 +122,28 @@ def delete_club(clubId):
     finally:
         cursor.close()
         connection.close()
+
+
+def get_club_officers(clubId):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        query = """
+            SELECT Users.UserID, Users.Name, Memberships.Role
+            FROM Clubs
+            JOIN Memberships ON Clubs.ClubID = Memberships.ClubID
+            JOIN Users ON Users.UserID = Memberships.UserID
+            WHERE Clubs.ClubID = %s
+              AND Memberships.Status = %s
+              AND Memberships.Role IN (%s, %s)
+        """
+        cursor.execute(
+            query,
+            [clubId, MembershipStatus.ACTIVE, ClubRole.OFFICER, ClubRole.PRESIDENT],
+        )
+        return cursor.fetchall()
+    except Exception as e:
+        raise e
+    finally:
+        cursor.close()
+        connection.close()

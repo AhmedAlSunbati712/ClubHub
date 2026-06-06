@@ -1,25 +1,129 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Plus, CalendarDays, MapPin } from 'lucide-react';
-import { useClub } from '../../hooks/useClubs.js';
-import { useToast } from '../../context/ToastContext.jsx';
+import { toast } from 'react-toastify';
+import { useAuth } from '../../context/AuthContext.jsx';
+import { useClub, useClubOfficers } from '../../api/clubs.ts';
+import { useMembershipCount, useUserMemberships } from '../../api/membership.ts';
+import { useClubEvents } from '../../api/events.ts';
 import ClubHeader from '../../components/clubs/ClubHeader.jsx';
 import ClubStats from '../../components/clubs/ClubStats.jsx';
 import OfficerList from '../../components/clubs/OfficerList.jsx';
 import CapacityBar from '../../components/common/CapacityBar.jsx';
 import Button from '../../components/common/Button.jsx';
 import CreateEventModal from '../../components/events/CreateEventModal.jsx';
-import { getEventsByIds } from '../../data/fixtures.js';
 import { formatEventDate } from '../../utils/format.js';
 
-// Images 7, 8 — club hero + events + officers + stats.
 export default function ClubDetail() {
   const { clubId } = useParams();
-  const { club } = useClub(clubId);
-  const { toast } = useToast();
+  const { user } = useAuth();
   const [createOpen, setCreateOpen] = useState(false);
+  const {
+    data: club,
+    isLoading: isLoadingClub,
+    isError: isErrorClub,
+  } = useClub(clubId);
+  const {
+    data: officers,
+    isLoading: isLoadingOfficers,
+    isError: isErrorOfficers,
+  } = useClubOfficers(clubId);
+  const {
+    data: memberCount = 0,
+    isLoading: isLoadingMemberCount,
+    isError: isErrorMemberCount,
+  } = useMembershipCount(clubId);
+  const {
+    data: clubEvents,
+    isLoading: isLoadingClubEvents,
+    isError: isErrorClubEvents,
+  } = useClubEvents(clubId);
+  const {
+    data: userMemberships,
+    isLoading: isLoadingUserMemberships,
+    isError: isErrorUserMemberships,
+  } = useUserMemberships(user?.id);
 
-  if (!club) {
+  const viewerMembership = useMemo(
+    () => (userMemberships ?? []).find((membership) => String(membership.clubId) === String(clubId)) ?? null,
+    [userMemberships, user?.id, clubId],
+  );
+
+  const officerCount = useMemo(
+    () => (officers ?? []).length,
+    [officers],
+  );
+
+  const upcomingEvents = useMemo(
+    () =>
+      (clubEvents ?? [])
+        .filter(
+          (event) =>
+            event.date &&
+            new Date(event.date) >= new Date() &&
+            event.status !== 'Cancelled' &&
+            event.status !== 'Completed',
+        )
+        .map((event) => ({
+          ...event,
+          location: [event.building, event.room].filter(Boolean).join(' '),
+          filled: event.confirmedCount,
+        })),
+    [clubEvents],
+  );
+
+  const clubForDisplay = useMemo(() => {
+    if (!club) {
+      return null;
+    }
+
+    return {
+      ...club,
+      viewerRole: viewerMembership?.role ?? null,
+      memberCount,
+    };
+  }, [club, viewerMembership, memberCount]);
+
+  const stats = useMemo(
+    () => ({
+      members: memberCount,
+      officers: officerCount,
+      upcomingEvents: upcomingEvents.length,
+    }),
+    [memberCount, officerCount, upcomingEvents],
+  );
+
+  const isLoading =
+    isLoadingClub ||
+    isLoadingOfficers ||
+    isLoadingClubEvents ||
+    isLoadingMemberCount ||
+    isLoadingUserMemberships;
+
+  const isError =
+    isErrorClub ||
+    isErrorOfficers ||
+    isErrorClubEvents ||
+    isErrorMemberCount ||
+    isErrorUserMemberships;
+
+  if (isLoading) {
+    return (
+      <div className="container page">
+        <p className="empty-state">Loading...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="container page">
+        <p className="empty-state">Failed to load club details.</p>
+      </div>
+    );
+  }
+
+  if (!clubForDisplay) {
     return (
       <div className="container page">
         <p className="empty-state">Club not found.</p>
@@ -27,12 +131,11 @@ export default function ClubDetail() {
     );
   }
 
-  const canManage = club.viewerRole === 'Officer' || club.viewerRole === 'President';
-  const clubEvents = getEventsByIds(club.events);
+  const canManage = clubForDisplay.viewerRole === 'Officer' || clubForDisplay.viewerRole === 'President';
 
   return (
     <div className="container page">
-      <ClubHeader club={club} />
+      <ClubHeader club={clubForDisplay} />
 
       <div className="club-detail__grid">
         <section className="card card-pad">
@@ -46,10 +149,10 @@ export default function ClubDetail() {
             )}
           </div>
 
-          {clubEvents.length === 0 ? (
+          {upcomingEvents.length === 0 ? (
             <p className="empty-state">No upcoming events.</p>
           ) : (
-            clubEvents.map((event) => (
+            upcomingEvents.map((event) => (
               <article className="club-event-item" key={event.id}>
                 <div className="club-event-item__head">
                   <h3 className="club-event-item__title">{event.title}</h3>
@@ -58,7 +161,7 @@ export default function ClubDetail() {
                       type="button"
                       className="club-link"
                       style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                      onClick={() => toast(`Manage “${event.title}” coming soon`, { variant: 'info' })}
+                      onClick={() => toast.info(`Manage “${event.title}” coming soon`)}
                     >
                       Manage
                     </button>
@@ -84,12 +187,12 @@ export default function ClubDetail() {
         </section>
 
         <aside className="club-detail__side">
-          <OfficerList officers={club.officers} />
+          <OfficerList officers={officers ?? []} />
           <div className="card card-pad">
             <h2 className="section-title" style={{ marginBottom: 'var(--space-4)' }}>
               Club Stats
             </h2>
-            <ClubStats stats={club.stats} />
+            <ClubStats stats={stats} />
           </div>
         </aside>
       </div>
@@ -97,8 +200,8 @@ export default function ClubDetail() {
       <CreateEventModal
         open={createOpen}
         onClose={() => setCreateOpen(false)}
-        clubs={[{ id: club.id, name: club.name }]}
-        defaultClubId={club.id}
+        clubs={[{ id: clubForDisplay.id, name: clubForDisplay.name }]}
+        defaultClubId={clubForDisplay.id}
       />
     </div>
   );

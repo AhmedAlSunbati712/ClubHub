@@ -106,3 +106,11 @@ def delete_club(clubId):
         return jsonify({"message": "Successful deletion"}), 200
     except Exception as e:
         return jsonify({"Error": f"Failed to delete club: {e}"}), 500
+
+
+def get_club_officers(clubId):
+    try:
+        clubs = club_service.get_club_officers(clubId)
+        return jsonify(clubs), 200
+    except Exception as e:
+        return jsonify({"Error": f"Failed to fetch club officers for club {clubId}: {e}"}), 500
