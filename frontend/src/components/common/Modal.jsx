@@ -5,6 +5,11 @@ import { X } from 'lucide-react';
 export default function Modal({ open, onClose, title, children, labelledBy }) {
   const dialogRef = useRef(null);
   const lastActive = useRef(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   const onCloseRef = useRef(onClose);
   onCloseRef.current = onClose;
@@ -34,7 +39,7 @@ export default function Modal({ open, onClose, title, children, labelledBy }) {
   if (!open) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={() => onCloseRef.current?.()}>
       <div
         className="modal"
         role="dialog"
@@ -48,7 +53,7 @@ export default function Modal({ open, onClose, title, children, labelledBy }) {
             <h2 className="modal__title" id={labelledBy}>
               {title}
             </h2>
-            <button type="button" className="icon-btn" aria-label="Close" onClick={onClose}>
+            <button type="button" className="icon-btn" aria-label="Close" onClick={() => onCloseRef.current?.()}>
               <X size={18} />
             </button>
           </div>

@@ -25,6 +25,7 @@ export interface EventListQuery {
   clubId?: number;
   status?: string;
   title?: string;
+  locationId?: number;
 }
 
 export interface CreateEventPayload {
