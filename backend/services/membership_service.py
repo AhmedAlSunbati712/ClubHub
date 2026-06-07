@@ -28,7 +28,7 @@ def get_membership(userId, clubId):
     cursor = connection.cursor(dictionary=True)
     try:
         cursor.execute(
-            "SELECT m.UserID, m.ClubID, u.Name, u.Email, m.Role, m.Status, m.JoinDate FROM Memberships m JOIN Users u ON u.UserId = m.UserId WHERE UserID = %s AND ClubID = %s",
+            "SELECT m.UserID, m.ClubID, u.Name, u.Email, m.Role, m.Status, m.JoinDate FROM Memberships m JOIN Users u ON u.UserID = m.UserID WHERE UserID = %s AND ClubID = %s",
             [userId, clubId],
         )
         return cursor.fetchone()
@@ -41,7 +41,7 @@ def get_memberships_by_club(clubId):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT m.UserID, m.ClubID, u.Name, u.Email, m.Role, m.Status, m.JoinDate FROM Memberships m JOIN Users u ON u.UserId = m.UserId WHERE ClubID = %s", [clubId])
+        cursor.execute("SELECT m.UserID, m.ClubID, u.Name, u.Email, m.Role, m.Status, m.JoinDate FROM Memberships m JOIN Users u ON u.UserID = m.UserID WHERE ClubID = %s", [clubId])
         return cursor.fetchall()
     finally:
         cursor.close()
@@ -127,7 +127,7 @@ def get_memberships_count(clubId: int):
     connection = get_connection()
     cursor = connection.cursor(dictionary = True)
     try:
-        query = "SELECT Count(*) as memberships_count FROM Memberships WHERE ClubId = %s"
+        query = "SELECT Count(*) as memberships_count FROM Memberships WHERE ClubID = %s"
         cursor.execute(query, [clubId])
         return cursor.fetchone()
     except Exception as e:
