@@ -66,8 +66,9 @@ def get_events():
     club_id = request.args.get("clubId", type=int)
     status = request.args.get("status")
     title = request.args.get("title")
+    location_id = request.args.get('locationId')
     try:
-        events = event_service.get_events(clubId=club_id, status=status, title=title)
+        events = event_service.get_events(clubId=club_id, status=status, title=title, locationId=location_id)
         return jsonify(events), 200
     except Exception as e:
         return jsonify({"Error": f"Failed to get events: {e}"}), 500

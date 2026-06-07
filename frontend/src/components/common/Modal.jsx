@@ -5,12 +5,17 @@ import { X } from 'lucide-react';
 export default function Modal({ open, onClose, title, children, labelledBy }) {
   const dialogRef = useRef(null);
   const lastActive = useRef(null);
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!open) return;
     lastActive.current = document.activeElement;
     const onKey = (e) => {
-      if (e.key === 'Escape') onClose?.();
+      if (e.key === 'Escape') onCloseRef.current?.();
     };
     document.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';
@@ -26,12 +31,12 @@ export default function Modal({ open, onClose, title, children, labelledBy }) {
       document.body.style.overflow = '';
       lastActive.current?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
   return (
-    <div className="modal-overlay" onClick={onClose}>
+    <div className="modal-overlay" onClick={() => onCloseRef.current?.()}>
       <div
         className="modal"
         role="dialog"
@@ -45,7 +50,7 @@ export default function Modal({ open, onClose, title, children, labelledBy }) {
             <h2 className="modal__title" id={labelledBy}>
               {title}
             </h2>
-            <button type="button" className="icon-btn" aria-label="Close" onClick={onClose}>
+            <button type="button" className="icon-btn" aria-label="Close" onClick={() => onCloseRef.current?.()}>
               <X size={18} />
             </button>
           </div>

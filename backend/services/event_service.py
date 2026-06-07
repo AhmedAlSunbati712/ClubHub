@@ -76,7 +76,7 @@ def get_event_by_id(eventId):
         connection.close()
 
 
-def get_events(clubId=None, status=None, title=None):
+def get_events(clubId=None, status=None, title=None, locationId=None):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
@@ -99,6 +99,9 @@ def get_events(clubId=None, status=None, title=None):
         if title:
             query += " AND Events.Title LIKE %s"
             params.append(f"%{title}%")
+        if locationId:
+            query += " AND Events.LocationId = %s"
+            params.append(f"{locationId}")
         cursor.execute(query, params)
         return cursor.fetchall()
     finally:

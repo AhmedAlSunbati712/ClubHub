@@ -5,7 +5,7 @@
 from flask import g, request, jsonify
 from pydantic import ValidationError
 from schemas import CreateLocationSchema, UpdateLocationSchema
-from services import location_service
+from services import location_service, event_service
 
 
 def create_location():
@@ -69,8 +69,13 @@ def delete_location(locationId):
     if not location:
         return jsonify({"Error": f"Location with id {locationId} not found"}), 404
 
-    if location_service.valid_location(locationId):
-        return jsonify({"Error": "Cannot delete a location that has events"}), 409
+    # check if this location has any events
+    try:
+        location_events = event_service.get_events(locationId=locationId)
+        if len(location_events) != 0:
+            return jsonify({"Error": "Cannot delete a location that has events"}), 409
+    except Exception as e:
+        return jsonify({"Error": f"Failed to check events for location {locationId}: {e}"}), 500
 
     try:
         location_service.delete_location(locationId)
