@@ -6,6 +6,7 @@ from .auths import bp as auth_bp
 from .clubs import bp as clubs_bp
 from .memberships import bp as memberships_bp
 from .locations import bp as locations_bp
+from .admin import bp as admin_bp
 
 all_blueprints = [
     users_bp,
@@ -17,4 +18,5 @@ all_blueprints = [
     clubs_bp,
     memberships_bp,
     locations_bp,
+    admin_bp,
 ]
