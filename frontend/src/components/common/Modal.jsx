@@ -11,9 +11,6 @@ export default function Modal({ open, onClose, title, children, labelledBy }) {
     onCloseRef.current = onClose;
   }, [onClose]);
 
-  const onCloseRef = useRef(onClose);
-  onCloseRef.current = onClose;
-
   useEffect(() => {
     if (!open) return;
     lastActive.current = document.activeElement;
