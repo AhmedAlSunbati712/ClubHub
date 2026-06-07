@@ -4,6 +4,7 @@
 
 from config import get_connection
 from models.enums import ClubRole, MembershipStatus
+from datetime import datetime
 
 
 def club_is_active(clubId):
@@ -144,6 +145,27 @@ def get_club_officers(clubId):
         return cursor.fetchall()
     except Exception as e:
         raise e
+    finally:
+        cursor.close()
+        connection.close()
+
+
+def club_has_upcoming_events(clubId):
+    connection = get_connection()
+    cursor = connection.cursor(dictionary=True)
+    try:
+        cursor.execute(
+            """
+            SELECT COUNT(*) as count
+            FROM Events
+            WHERE ClubID = %s
+              AND EventDateTime >= %s
+              AND Status NOT IN ('Cancelled', 'Completed')
+            """,
+            [clubId, datetime.now()],
+        )
+        row = cursor.fetchone()
+        return row["count"] > 0
     finally:
         cursor.close()
         connection.close()

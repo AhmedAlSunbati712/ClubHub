@@ -1,7 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Plus, CalendarDays, MapPin } from 'lucide-react';
-import { toast } from 'react-toastify';
 import { useAuth } from '../../context/AuthContext.jsx';
 import { useClub, useClubOfficers } from '../../api/clubs.ts';
 import { useMembershipCount, useUserMemberships } from '../../api/membership.ts';
@@ -12,12 +11,15 @@ import OfficerList from '../../components/clubs/OfficerList.jsx';
 import CapacityBar from '../../components/common/CapacityBar.jsx';
 import Button from '../../components/common/Button.jsx';
 import CreateEventModal from '../../components/events/CreateEventModal.jsx';
+import EditEventModal from '../../components/events/EditEventModal.jsx';
 import { formatEventDate } from '../../utils/format.js';
 
 export default function ClubDetail() {
   const { clubId } = useParams();
   const { user } = useAuth();
   const [createOpen, setCreateOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
   const {
     data: club,
     isLoading: isLoadingClub,
@@ -133,6 +135,11 @@ export default function ClubDetail() {
 
   const canManage = clubForDisplay.viewerRole === 'Officer' || clubForDisplay.viewerRole === 'President';
 
+  const openManageEvent = (event) => {
+    setSelectedEvent(event);
+    setEditOpen(true);
+  };
+
   return (
     <div className="container page">
       <ClubHeader club={clubForDisplay} />
@@ -161,7 +168,7 @@ export default function ClubDetail() {
                       type="button"
                       className="club-link"
                       style={{ background: 'none', border: 'none', cursor: 'pointer' }}
-                      onClick={() => toast.info(`Manage “${event.title}” coming soon`)}
+                      onClick={() => openManageEvent(event)}
                     >
                       Manage
                     </button>
@@ -202,6 +209,15 @@ export default function ClubDetail() {
         onClose={() => setCreateOpen(false)}
         clubs={[{ id: clubForDisplay.id, name: clubForDisplay.name }]}
         defaultClubId={clubForDisplay.id}
+      />
+      <EditEventModal
+        open={editOpen}
+        onClose={() => {
+          setEditOpen(false);
+          setSelectedEvent(null);
+        }}
+        event={selectedEvent}
+        clubId={clubForDisplay.id}
       />
     </div>
   );

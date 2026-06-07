@@ -144,18 +144,22 @@ export default function ManageClub() {
 
   const handleEdit = () => setEditOpen(true);
 
-  const handleDeactivate = async () => {
+  const handleToggleStatus = async () => {
+    const isInactive = club?.status === 'Inactive';
+    const nextStatus = isInactive ? 'Active' : 'Inactive';
     const ok = await confirm({
-      title: 'Deactivate club?',
-      message: `${club?.name ?? 'This club'} will be hidden from students. This can be undone by an admin.`,
-      confirmLabel: 'Deactivate',
+      title: isInactive ? 'Reactivate club?' : 'Deactivate club?',
+      message: isInactive
+        ? `${club?.name ?? 'This club'} will be visible to students again.`
+        : `${club?.name ?? 'This club'} will be hidden from students. This cannot be done while it has upcoming events.`,
+      confirmLabel: isInactive ? 'Reactivate' : 'Deactivate',
     });
     if (!ok) return;
     updateClub(
-      { clubId, payload: { status: 'Inactive' } },
+      { clubId, payload: { status: nextStatus } },
       {
-        onSuccess: () => toast.info(`${club?.name ?? 'Club'} deactivated`),
-        onError: (error) => toast.error(errorMessage(error, 'Failed to deactivate club')),
+        onSuccess: () => toast.success(`${club?.name ?? 'Club'} ${isInactive ? 'reactivated' : 'deactivated'}`),
+        onError: (error) => toast.error(errorMessage(error, 'Failed to update club status')),
       },
     );
   };
@@ -325,6 +329,10 @@ export default function ManageClub() {
               <span className="pill">{club?.category}</span>
             </div>
             <div className="settings-field">
+              <div className="settings-field__label">Status</div>
+              <span className={`pill${club?.status === 'Inactive' ? ' pill--danger' : ''}`}>{club?.status}</span>
+            </div>
+            <div className="settings-field">
               <div className="settings-field__label">Description</div>
               <div className="settings-field__value">{club?.description}</div>
             </div>
@@ -334,8 +342,8 @@ export default function ManageClub() {
 
             <div className="danger-zone">
               <div className="danger-zone__title">Danger Zone</div>
-              <Button variant="danger" onClick={handleDeactivate}>
-                Deactivate Club
+              <Button variant={club?.status === 'Inactive' ? 'success' : 'danger'} onClick={handleToggleStatus}>
+                {club?.status === 'Inactive' ? 'Reactivate Club' : 'Deactivate Club'}
               </Button>
             </div>
           </>

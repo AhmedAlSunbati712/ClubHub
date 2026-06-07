@@ -77,6 +77,9 @@ def update_club(clubId):
     except ValidationError as e:
         return jsonify({"errors": e.errors()}), 422
 
+    if body.status == "Inactive" and club_service.club_has_upcoming_events(clubId):
+        return jsonify({"Error": "Cannot deactivate a club with upcoming events"}), 409
+
     try:
         count = club_service.update_club(
             clubId,
