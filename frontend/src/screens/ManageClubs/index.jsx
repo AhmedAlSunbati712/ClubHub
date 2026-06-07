@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus } from 'lucide-react';
-import { useClubs } from '../../hooks/useClubs.js';
-import { useToast } from '../../context/ToastContext.jsx';
+import { toast } from 'react-toastify';
+import { useClubs, useDeleteClub } from '../../api/clubs.ts';
 import { useConfirm } from '../../context/ConfirmContext.jsx';
 import ClubTable from '../../components/admin/ClubTable.jsx';
 import Button from '../../components/common/Button.jsx';
@@ -9,14 +9,15 @@ import Button from '../../components/common/Button.jsx';
 // Image 2 — Manage Clubs.
 export default function ManageClubs() {
   const navigate = useNavigate();
-  const { clubs } = useClubs();
-  const { toast } = useToast();
   const confirm = useConfirm();
 
-  const handleEdit = (id) => {
-    const club = clubs.find((c) => c.id === id);
-    toast(`Editing ${club?.name ?? 'club'} — form coming soon`, { variant: 'info' });
-  };
+  const { data: clubs = [], isLoading, isError } = useClubs();
+  const { mutate: deleteClub } = useDeleteClub();
+
+  const errorMessage = (error, fallback) => error?.response?.data?.Error || fallback;
+
+  const handleEdit = (id) => navigate(`/clubs/${id}/manage`);
+
   const handleDelete = async (id) => {
     const club = clubs.find((c) => c.id === id);
     const ok = await confirm({
@@ -24,8 +25,28 @@ export default function ManageClubs() {
       message: `${club?.name ?? 'This club'} and its memberships will be permanently removed.`,
       confirmLabel: 'Delete',
     });
-    if (ok) toast(`${club?.name ?? 'Club'} deleted`, { variant: 'info' });
+    if (!ok) return;
+    deleteClub(id, {
+      onSuccess: () => toast.info(`${club?.name ?? 'Club'} deleted`),
+      onError: (error) => toast.error(errorMessage(error, 'Failed to delete club')),
+    });
   };
+
+  if (isLoading) {
+    return (
+      <div className="container page">
+        <p className="empty-state">Loading...</p>
+      </div>
+    );
+  }
+
+  if (isError) {
+    return (
+      <div className="container page">
+        <p className="empty-state">Failed to load clubs.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="container page">
@@ -39,7 +60,7 @@ export default function ManageClubs() {
             <p className="page-subtitle">{clubs.length} total clubs registered</p>
           </div>
         </div>
-        <Button variant="primary" onClick={() => toast('Create club form coming soon', { variant: 'info' })}>
+        <Button variant="primary" onClick={() => toast.info('Create club form coming soon')}>
           <Plus size={16} />
           Create New Club
         </Button>
