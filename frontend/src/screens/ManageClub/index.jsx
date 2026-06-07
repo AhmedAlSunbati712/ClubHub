@@ -1,13 +1,16 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, UserPlus, Trash2, CheckCircle2, XCircle } from 'lucide-react';
-import { useClub } from '../../hooks/useClubs.js';
-import { useMembership } from '../../hooks/useMembership.js';
-import { useToast } from '../../context/ToastContext.jsx';
+import { ArrowLeft, UserPlus, Trash2, CheckCircle2, XCircle, Inbox } from 'lucide-react';
+import { toast } from 'react-toastify';
+import { useClub, useUpdateClub } from '../../api/clubs.ts';
+import {
+  useClubMemberships,
+  useUpdateMembership,
+  useDeleteMembership,
+} from '../../api/membership.ts';
 import { useConfirm } from '../../context/ConfirmContext.jsx';
 import Avatar from '../../components/common/Avatar.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
-import { Inbox } from 'lucide-react';
 import RoleBadge from '../../components/common/RoleBadge.jsx';
 import Button from '../../components/common/Button.jsx';
 import { formatDate } from '../../utils/format.js';
@@ -16,39 +19,111 @@ import { formatDate } from '../../utils/format.js';
 export default function ManageClub() {
   const { clubId } = useParams();
   const navigate = useNavigate();
-  const { club } = useClub(clubId);
-  const { members, pending } = useMembership(clubId);
-  const { toast } = useToast();
   const confirm = useConfirm();
   const [tab, setTab] = useState('members');
 
-  const handleApprove = (p) => toast(`Approved ${p.name}'s application`);
-  const handleReject = async (p) => {
+  const {
+    data: club,
+    isLoading: isLoadingClub,
+    isError: isErrorClub,
+  } = useClub(clubId);
+  const {
+    data: memberships,
+    isLoading: isLoadingMemberships,
+    isError: isErrorMemberships,
+  } = useClubMemberships(clubId);
+  const { mutate: updateMembership } = useUpdateMembership();
+  const { mutate: deleteMembership } = useDeleteMembership();
+  const { mutate: updateClub } = useUpdateClub();
+
+  const members = useMemo(
+    () => (memberships ?? []).filter((membership) => membership.status === 'Active'),
+    [memberships],
+  );
+  const pending = useMemo(
+    () => (memberships ?? []).filter((membership) => membership.status === 'Pending'),
+    [memberships],
+  );
+
+  const errorMessage = (error, fallback) => error?.response?.data?.Error || fallback;
+
+  const handleApprove = (applicant) => {
+    updateMembership(
+      { clubId, userId: applicant.userId, payload: { status: 'Active' } },
+      {
+        onSuccess: () => toast.success(`Approved ${applicant.name || 'the applicant'}`),
+        onError: (error) => toast.error(errorMessage(error, 'Failed to approve application')),
+      },
+    );
+  };
+
+  const handleReject = async (applicant) => {
     const ok = await confirm({
       title: 'Reject application?',
-      message: `${p.name}'s request to join will be declined.`,
+      message: `${applicant.name || 'This applicant'}'s request to join will be declined.`,
       confirmLabel: 'Reject',
     });
-    if (ok) toast(`Rejected ${p.name}'s application`, { variant: 'info' });
+    if (!ok) return;
+    deleteMembership(
+      { clubId, userId: applicant.userId },
+      {
+        onSuccess: () => toast.info(`Rejected ${applicant.name || 'the applicant'}`),
+        onError: (error) => toast.error(errorMessage(error, 'Failed to reject application')),
+      },
+    );
   };
-  const handleRemove = async (m) => {
+
+  const handleRemove = async (member) => {
     const ok = await confirm({
       title: 'Remove member?',
-      message: `${m.name} will be removed from ${club?.name ?? 'this club'}.`,
+      message: `${member.name || 'This member'} will be removed from ${club?.name ?? 'this club'}.`,
       confirmLabel: 'Remove',
     });
-    if (ok) toast(`Removed ${m.name}`, { variant: 'info' });
+    if (!ok) return;
+    deleteMembership(
+      { clubId, userId: member.userId },
+      {
+        onSuccess: () => toast.info(`Removed ${member.name || 'member'}`),
+        onError: (error) => toast.error(errorMessage(error, 'Failed to remove member')),
+      },
+    );
   };
-  const handleInvite = () => toast('Invite flow coming soon', { variant: 'info' });
-  const handleEdit = () => toast('Edit form coming soon', { variant: 'info' });
+
+  const handleInvite = () => toast.info('Invite flow coming soon');
+
+  const handleEdit = () => toast.info('Edit form coming soon');
+
   const handleDeactivate = async () => {
     const ok = await confirm({
       title: 'Deactivate club?',
-      message: `${club?.name ?? 'This club'} will be hidden and members notified. This can be undone by an admin.`,
+      message: `${club?.name ?? 'This club'} will be hidden from students. This can be undone by an admin.`,
       confirmLabel: 'Deactivate',
     });
-    if (ok) toast(`${club?.name ?? 'Club'} deactivated`, { variant: 'info' });
+    if (!ok) return;
+    updateClub(
+      { clubId, payload: { status: 'Inactive' } },
+      {
+        onSuccess: () => toast.info(`${club?.name ?? 'Club'} deactivated`),
+        onError: (error) => toast.error(errorMessage(error, 'Failed to deactivate club')),
+      },
+    );
   };
+
+  if (isLoadingClub || isLoadingMemberships) {
+    return (
+      <div className="container page">
+        <p className="empty-state">Loading...</p>
+      </div>
+    );
+  }
+
+  if (isErrorClub || isErrorMemberships) {
+    return (
+      <div className="container page">
+        <p className="empty-state">Failed to load club.</p>
+      </div>
+    );
+  }
 
   const tabs = [
     { id: 'members', label: `Members (${members.length})` },
@@ -88,46 +163,50 @@ export default function ManageClub() {
                 Invite Member
               </Button>
             </div>
-            <div className="table-wrap">
-              <table className="data-table">
-                <thead>
-                  <tr>
-                    <th>Member</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Join Date</th>
-                    <th className="col-actions">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {members.map((m) => (
-                    <tr key={m.id}>
-                      <td>
-                        <span className="cell-user">
-                          <Avatar name={m.name} size="sm" muted />
-                          {m.name}
-                        </span>
-                      </td>
-                      <td className="muted">{m.email}</td>
-                      <td>
-                        <RoleBadge role={m.role} />
-                      </td>
-                      <td className="tnum">{formatDate(m.joinDate)}</td>
-                      <td className="col-actions">
-                        <button
-                          type="button"
-                          className="icon-btn icon-btn--delete"
-                          aria-label={`Remove ${m.name}`}
-                          onClick={() => handleRemove(m)}
-                        >
-                          <Trash2 />
-                        </button>
-                      </td>
+            {members.length === 0 ? (
+              <EmptyState icon={Inbox} title="No active members" hint="Approved members will appear here." />
+            ) : (
+              <div className="table-wrap">
+                <table className="data-table">
+                  <thead>
+                    <tr>
+                      <th>Member</th>
+                      <th>Email</th>
+                      <th>Role</th>
+                      <th>Join Date</th>
+                      <th className="col-actions">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {members.map((m) => (
+                      <tr key={m.userId}>
+                        <td>
+                          <span className="cell-user">
+                            <Avatar name={m.name} size="sm" muted />
+                            {m.name}
+                          </span>
+                        </td>
+                        <td className="muted">{m.email}</td>
+                        <td>
+                          <RoleBadge role={m.role} />
+                        </td>
+                        <td className="tnum">{formatDate(m.joinDate)}</td>
+                        <td className="col-actions">
+                          <button
+                            type="button"
+                            className="icon-btn icon-btn--delete"
+                            aria-label={`Remove ${m.name}`}
+                            onClick={() => handleRemove(m)}
+                          >
+                            <Trash2 />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </>
         )}
 
@@ -151,7 +230,7 @@ export default function ManageClub() {
                   </thead>
                   <tbody>
                     {pending.map((p) => (
-                      <tr key={p.id}>
+                      <tr key={p.userId}>
                         <td>
                           <span className="cell-user">
                             <Avatar name={p.name} size="sm" muted />
@@ -159,7 +238,7 @@ export default function ManageClub() {
                           </span>
                         </td>
                         <td className="muted">{p.email}</td>
-                        <td className="tnum">{formatDate(p.appliedOn)}</td>
+                        <td className="tnum">{formatDate(p.joinDate)}</td>
                         <td className="col-actions">
                           <span className="cell-actions">
                             <Button variant="success" className="btn-sm" onClick={() => handleApprove(p)}>
