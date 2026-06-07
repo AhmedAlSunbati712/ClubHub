@@ -1,6 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, UserPlus, Trash2, CheckCircle2, XCircle, Inbox } from 'lucide-react';
+import { ArrowLeft, UserPlus, Trash2, CheckCircle2, XCircle, Inbox, Type, AlignLeft, ChevronDown } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useClub, useUpdateClub } from '../../api/clubs.ts';
 import {
@@ -13,7 +13,22 @@ import Avatar from '../../components/common/Avatar.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
 import RoleBadge from '../../components/common/RoleBadge.jsx';
 import Button from '../../components/common/Button.jsx';
+import Modal from '../../components/common/Modal.jsx';
 import { formatDate } from '../../utils/format.js';
+
+const CLUB_CATEGORIES = [
+  'Academic',
+  'Arts & Performance',
+  'Cultural & Identity',
+  'Community Service',
+  'Sports & Recreation',
+  'Political & Advocacy',
+  'Religious & Spiritual',
+  'Professional & Career',
+  'Greek Life',
+  'Media & Publications',
+  'Other',
+];
 
 // Images 9, 10, 11 — tabbed: Members / Pending / Settings.
 export default function ManageClub() {
@@ -21,6 +36,9 @@ export default function ManageClub() {
   const navigate = useNavigate();
   const confirm = useConfirm();
   const [tab, setTab] = useState('members');
+  const [editOpen, setEditOpen] = useState(false);
+  const [editForm, setEditForm] = useState({ name: '', category: '', description: '' });
+  const [editErrors, setEditErrors] = useState({});
 
   const {
     data: club,
@@ -34,7 +52,7 @@ export default function ManageClub() {
   } = useClubMemberships(clubId);
   const { mutate: updateMembership } = useUpdateMembership();
   const { mutate: deleteMembership } = useDeleteMembership();
-  const { mutate: updateClub } = useUpdateClub();
+  const { mutate: updateClub, isPending: isSavingClub } = useUpdateClub();
 
   const members = useMemo(
     () => (memberships ?? []).filter((membership) => membership.status === 'Active'),
@@ -44,6 +62,39 @@ export default function ManageClub() {
     () => (memberships ?? []).filter((membership) => membership.status === 'Pending'),
     [memberships],
   );
+
+  useEffect(() => {
+    if (club && editOpen) {
+      setEditForm({ name: club.name ?? '', category: club.category ?? '', description: club.description ?? '' });
+      setEditErrors({});
+    }
+  }, [editOpen, club]);
+
+  const setEdit = (key, value) => {
+    setEditForm((f) => ({ ...f, [key]: value }));
+    setEditErrors((e) => ({ ...e, [key]: undefined }));
+  };
+
+  const validateEdit = () => {
+    const next = {};
+    if (!editForm.name.trim()) next.name = 'Name is required';
+    if (!editForm.category) next.category = 'Select a category';
+    if (!editForm.description.trim()) next.description = 'Add a short description';
+    setEditErrors(next);
+    return Object.keys(next).length === 0;
+  };
+
+  const submitEdit = (e) => {
+    e.preventDefault();
+    if (!validateEdit()) return;
+    updateClub(
+      { clubId, payload: { name: editForm.name.trim(), category: editForm.category, description: editForm.description.trim() } },
+      {
+        onSuccess: () => { toast.success('Club info updated'); setEditOpen(false); },
+        onError: (error) => toast.error(errorMessage(error, 'Failed to update club')),
+      },
+    );
+  };
 
   const errorMessage = (error, fallback) => error?.response?.data?.Error || fallback;
 
@@ -91,7 +142,7 @@ export default function ManageClub() {
 
   const handleInvite = () => toast.info('Invite flow coming soon');
 
-  const handleEdit = () => toast.info('Edit form coming soon');
+  const handleEdit = () => setEditOpen(true);
 
   const handleDeactivate = async () => {
     const ok = await confirm({
@@ -290,6 +341,61 @@ export default function ManageClub() {
           </>
         )}
       </section>
+
+      <Modal open={editOpen} onClose={() => setEditOpen(false)} title="Edit Club Information" labelledBy="edit-club-title">
+        <form className="form" onSubmit={submitEdit} noValidate>
+          <label className={`field${editErrors.name ? ' field--error' : ''}`}>
+            <span className="field__label">Club name</span>
+            <span className="field__control">
+              <Type className="field__icon" size={17} />
+              <input
+                type="text"
+                value={editForm.name}
+                onChange={(e) => setEdit('name', e.target.value)}
+                placeholder="Club name"
+              />
+            </span>
+            {editErrors.name && <span className="field__error">{editErrors.name}</span>}
+          </label>
+
+          <label className={`field${editErrors.category ? ' field--error' : ''}`}>
+            <span className="field__label">Category</span>
+            <span className="field__control field__control--select">
+              <select value={editForm.category} onChange={(e) => setEdit('category', e.target.value)}>
+                <option value="">Select a category…</option>
+                {CLUB_CATEGORIES.map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+              <ChevronDown className="field__chevron" size={16} />
+            </span>
+            {editErrors.category && <span className="field__error">{editErrors.category}</span>}
+          </label>
+
+          <label className={`field${editErrors.description ? ' field--error' : ''}`}>
+            <span className="field__label">Description</span>
+            <span className="field__control field__control--area">
+              <AlignLeft className="field__icon field__icon--top" size={17} />
+              <textarea
+                rows={3}
+                value={editForm.description}
+                onChange={(e) => setEdit('description', e.target.value)}
+                placeholder="What is this club about?"
+              />
+            </span>
+            {editErrors.description && <span className="field__error">{editErrors.description}</span>}
+          </label>
+
+          <div className="modal__actions">
+            <Button variant="secondary" type="button" onClick={() => setEditOpen(false)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSavingClub}>
+              {isSavingClub ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }
