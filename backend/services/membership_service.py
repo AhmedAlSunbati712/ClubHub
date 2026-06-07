@@ -91,14 +91,20 @@ def update_membership(userId, clubId, role=None, status=None):
         connection.close()
 
 
-def club_has_active_officer(clubId):
+def club_has_active_officer(clubId, exclude_user_id=None):
     connection = get_connection()
     cursor = connection.cursor()
     try:
-        cursor.execute(
-            "SELECT COUNT(*) FROM Memberships WHERE ClubID = %s AND Role IN (%s, %s) AND Status = %s",
-            [clubId, ClubRole.OFFICER, ClubRole.PRESIDENT, MembershipStatus.ACTIVE],
-        )
+        if exclude_user_id is not None:
+            cursor.execute(
+                "SELECT COUNT(*) FROM Memberships WHERE ClubID = %s AND Role IN (%s, %s) AND Status = %s AND UserID != %s",
+                [clubId, ClubRole.OFFICER, ClubRole.PRESIDENT, MembershipStatus.ACTIVE, exclude_user_id],
+            )
+        else:
+            cursor.execute(
+                "SELECT COUNT(*) FROM Memberships WHERE ClubID = %s AND Role IN (%s, %s) AND Status = %s",
+                [clubId, ClubRole.OFFICER, ClubRole.PRESIDENT, MembershipStatus.ACTIVE],
+            )
         count = cursor.fetchone()[0]
         return count > 0
     finally:

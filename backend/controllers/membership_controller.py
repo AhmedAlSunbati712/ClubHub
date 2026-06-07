@@ -80,7 +80,7 @@ def update_membership(clubId, userId):
 
     if body.role == ClubRole.MEMBER or body.status == MembershipStatus.INACTIVE:
         if membership["Role"] in [ClubRole.OFFICER, ClubRole.PRESIDENT]:
-            if not membership_service.club_has_active_officer(clubId):
+            if not membership_service.club_has_active_officer(clubId, exclude_user_id=userId):
                 return (
                     jsonify(
                         {
@@ -111,7 +111,7 @@ def delete_membership(clubId, userId):
         return jsonify({"Error": "Membership not found"}), 404
 
     if membership["Role"] in [ClubRole.OFFICER, ClubRole.PRESIDENT]:
-        if not membership_service.club_has_active_officer(clubId):
+        if not membership_service.club_has_active_officer(clubId, exclude_user_id=userId):
             return (
                 jsonify(
                     {"Error": "Club must have at least one active officer or president"}
