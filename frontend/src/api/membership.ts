@@ -7,6 +7,8 @@ export const USER_MEMBERSHIPS_KEY = 'user-memberships';
 export interface Membership {
   userId: number;
   clubId: number;
+  name: string;
+  email: string;
   role: string;
   status: string;
   joinDate: string | null;
@@ -24,6 +26,8 @@ interface BackendMembershipCount {
 interface BackendMembership {
   UserID?: number;
   ClubID?: number;
+  Name?: string;
+  Email?: string;
   Role?: string;
   Status?: string;
   JoinDate?: string | null;
@@ -32,6 +36,8 @@ interface BackendMembership {
 const normalizeMembership = (membership: BackendMembership): Membership => ({
   userId: membership.UserID ?? 0,
   clubId: membership.ClubID ?? 0,
+  name: membership.Name ?? '',
+  email: membership.Email ?? '',
   role: membership.Role ?? '',
   status: membership.Status ?? '',
   joinDate: membership.JoinDate ?? null,
