@@ -6,11 +6,14 @@ export default function Modal({ open, onClose, title, children, labelledBy }) {
   const dialogRef = useRef(null);
   const lastActive = useRef(null);
 
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
+
   useEffect(() => {
     if (!open) return;
     lastActive.current = document.activeElement;
     const onKey = (e) => {
-      if (e.key === 'Escape') onClose?.();
+      if (e.key === 'Escape') onCloseRef.current?.();
     };
     document.addEventListener('keydown', onKey);
     document.body.style.overflow = 'hidden';
@@ -26,7 +29,7 @@ export default function Modal({ open, onClose, title, children, labelledBy }) {
       document.body.style.overflow = '';
       lastActive.current?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 

@@ -6,21 +6,27 @@ import {
   IdCard,
   ArrowRight,
   MapPin,
+  LayoutDashboard,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
-import { useAdminStats } from '../../hooks/useAdminStats.js';
-import { useToast } from '../../context/ToastContext.jsx';
+import { useAdminStats } from '../../api/admin.ts';
 import TopClubsList from '../../components/admin/TopClubsList.jsx';
 import CapacityBar from '../../components/common/CapacityBar.jsx';
 import CountUp from '../../components/common/CountUp.jsx';
+import EmptyState from '../../components/common/EmptyState.jsx';
 import { formatDate } from '../../utils/format.js';
 import { ROUTES } from '../../constants/routes.js';
+
+const EMPTY_TOTALS = { clubs: 0, events: 0, students: 0, memberships: 0 };
 
 // Image 4 — Admin Dashboard.
 export default function AdminDashboard() {
   const { user } = useAuth();
-  const { stats, topClubs, upcomingEvents } = useAdminStats();
-  const { toast } = useToast();
+  const { data, isLoading, isError } = useAdminStats();
+
+  const stats = data?.totals ?? EMPTY_TOTALS;
+  const topClubs = data?.topClubs ?? [];
+  const upcomingEvents = data?.upcomingEvents ?? [];
 
   const tiles = [
     { label: 'Total Clubs', value: stats.clubs, icon: Users, cls: 'dash-tile--1' },
@@ -40,6 +46,20 @@ export default function AdminDashboard() {
         </div>
       </div>
 
+      {isLoading ? (
+        <EmptyState
+          icon={LayoutDashboard}
+          title="Loading dashboard"
+          hint="Crunching the latest numbers across DartClubs."
+        />
+      ) : isError ? (
+        <EmptyState
+          icon={LayoutDashboard}
+          title="Unable to load dashboard"
+          hint="Try refreshing the page."
+        />
+      ) : (
+      <>
       <div className="dash-tiles">
         {tiles.map(({ label, value, icon: Icon, cls }) => (
           <div className={`dash-tile ${cls}`} key={label}>
@@ -71,14 +91,10 @@ export default function AdminDashboard() {
               <MapPin size={16} />
               Manage Locations
             </Link>
-            <button
-              type="button"
-              className="btn btn-secondary btn-block"
-              onClick={() => toast('Student directory coming soon', { variant: 'info' })}
-            >
+            <Link to={ROUTES.ADMIN_STUDENTS} className="btn btn-secondary btn-block">
               <GraduationCap size={16} />
               View All Students
-            </button>
+            </Link>
           </div>
         </section>
 
@@ -107,6 +123,8 @@ export default function AdminDashboard() {
           ))}
         </section>
       </div>
+      </>
+      )}
     </div>
   );
 }

@@ -10,6 +10,7 @@ import Profile from '../Profile/index.jsx';
 import AdminDashboard from '../AdminDashboard/index.jsx';
 import ManageClubs from '../ManageClubs/index.jsx';
 import ManageLocations from '../ManageLocations/index.jsx';
+import ManageStudents from '../ManageStudents/index.jsx';
 import AppLayout from '../../components/layout/AppLayout.jsx';
 import { ROUTES } from '../../constants/routes.js';
 
@@ -29,6 +30,7 @@ export default function App() {
           <Route path={ROUTES.ADMIN} element={<AdminDashboard />} />
           <Route path={ROUTES.ADMIN_CLUBS} element={<ManageClubs />} />
           <Route path={ROUTES.ADMIN_LOCATIONS} element={<ManageLocations />} />
+          <Route path={ROUTES.ADMIN_STUDENTS} element={<ManageStudents />} />
         </Route>
         <Route path="*" element={<Navigate to={ROUTES.EVENTS} replace />} />
       </Routes>

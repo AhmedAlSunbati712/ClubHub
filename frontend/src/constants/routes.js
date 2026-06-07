@@ -9,4 +9,5 @@ export const ROUTES = {
   ADMIN: '/admin',
   ADMIN_CLUBS: '/admin/clubs',
   ADMIN_LOCATIONS: '/admin/locations',
+  ADMIN_STUDENTS: '/admin/students',
 };

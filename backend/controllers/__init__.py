@@ -6,3 +6,4 @@ from . import auth_controller
 from . import club_controller
 from . import membership_controller
 from . import location_controller
+from . import admin_controller
