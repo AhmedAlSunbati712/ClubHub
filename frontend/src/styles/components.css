@@ -605,6 +605,24 @@
   gap: var(--space-1);
   justify-content: flex-end;
 }
+.role-select {
+  appearance: none;
+  padding: var(--space-1) calc(var(--space-6)) var(--space-1) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  background: var(--surface)
+    url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23667085' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")
+    no-repeat right var(--space-2) center;
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: var(--text);
+  cursor: pointer;
+}
+.role-select:focus {
+  border-color: var(--dart-green);
+  box-shadow: var(--ring);
+  outline: none;
+}
 .cell-user {
   display: inline-flex;
   align-items: center;

@@ -18,6 +18,11 @@ def _is_officer_or_admin(userId, clubId, user_role):
     return membership["Role"] in [ClubRole.OFFICER, ClubRole.PRESIDENT]
 
 
+def _is_club_president(userId, clubId):
+    membership = membership_service.get_membership(userId, clubId)
+    return bool(membership) and membership["Role"] == ClubRole.PRESIDENT
+
+
 def create_membership(clubId):
     current_user = g.current_user
     userId = current_user["sub"]
@@ -78,6 +83,17 @@ def update_membership(clubId, userId):
     except ValidationError as e:
         return jsonify({"errors": e.errors()}), 422
 
+    if body.role is not None:
+        is_admin = current_user.get("role") == UserRole.ADMIN
+        if body.role == ClubRole.PRESIDENT:
+            if not is_admin:
+                return jsonify({"Error": "Only admins can assign the president role"}), 403
+        elif not (is_admin or _is_club_president(current_user["sub"], clubId)):
+            return (
+                jsonify({"Error": "Only the club president or an admin can change member roles"}),
+                403,
+            )
+
     if body.role == ClubRole.MEMBER or body.status == MembershipStatus.INACTIVE:
         if membership["Role"] in [ClubRole.OFFICER, ClubRole.PRESIDENT]:
             if not membership_service.club_has_active_officer(clubId, exclude_user_id=userId):
@@ -91,6 +107,9 @@ def update_membership(clubId, userId):
                 )
 
     try:
+        if body.role == ClubRole.PRESIDENT:
+            membership_service.demote_other_presidents(clubId, exclude_user_id=userId)
+
         rowcount = membership_service.update_membership(
             userId, clubId, role=body.role, status=body.status
         )

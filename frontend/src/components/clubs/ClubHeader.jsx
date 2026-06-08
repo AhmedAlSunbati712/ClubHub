@@ -2,15 +2,18 @@ import { Link } from 'react-router-dom';
 import { Users, Settings } from 'lucide-react';
 import { useToast } from '../../context/ToastContext.jsx';
 import { useConfirm } from '../../context/ConfirmContext.jsx';
+import { useCreateMembership } from '../../api/membership.ts';
 import { ROUTES } from '../../constants/routes.js';
 
 // gradient hero banner on club detail (Dartmouth green).
 export default function ClubHeader({ club }) {
   const { toast } = useToast();
   const confirm = useConfirm();
+  const { mutate: applyToClub, isPending: isApplying } = useCreateMembership();
   if (!club) return null;
   const canManage = club.viewerRole === 'Officer' || club.viewerRole === 'President';
-  const isMember = Boolean(club.viewerRole);
+  const isActiveMember = Boolean(club.viewerRole) && club.viewerStatus === 'Active';
+  const isPendingApplication = club.viewerStatus === 'Pending';
 
   const handleLeave = async () => {
     const ok = await confirm({
@@ -20,7 +23,13 @@ export default function ClubHeader({ club }) {
     });
     if (ok) toast(`You left ${club.name}`, { variant: 'info' });
   };
-  const handleApply = () => toast(`Application submitted to ${club.name}`);
+  const handleApply = () => {
+    applyToClub(club.id, {
+      onSuccess: () => toast(`Application submitted to ${club.name}`),
+      onError: (error) =>
+        toast(error?.response?.data?.Error || 'Failed to apply to join club', { variant: 'error' }),
+    });
+  };
 
   return (
     <header className="club-hero">
@@ -32,7 +41,8 @@ export default function ClubHeader({ club }) {
           <h1 className="club-hero__name">{club.name}</h1>
           <div className="club-hero__badges">
             <span className="pill">{club.category}</span>
-            {club.viewerRole && <span className="pill">{club.viewerRole}</span>}
+            {isActiveMember && <span className="pill">{club.viewerRole}</span>}
+            {isPendingApplication && <span className="pill">Pending</span>}
           </div>
         </div>
       </div>
@@ -45,13 +55,17 @@ export default function ClubHeader({ club }) {
       </div>
 
       <div className="club-hero__actions">
-        {isMember ? (
+        {isActiveMember ? (
           <button type="button" className="btn btn-on-dark" onClick={handleLeave}>
             Leave Club
           </button>
+        ) : isPendingApplication ? (
+          <button type="button" className="btn btn-on-light" disabled>
+            Application Pending
+          </button>
         ) : (
-          <button type="button" className="btn btn-on-light" onClick={handleApply}>
-            Apply to Join
+          <button type="button" className="btn btn-on-light" onClick={handleApply} disabled={isApplying}>
+            {isApplying ? 'Applying…' : 'Apply to Join'}
           </button>
         )}
         {canManage && (

@@ -82,6 +82,7 @@ export default function Clubs() {
     return filteredClubs.map((club) => ({
       ...club,
       viewerRole: membershipsByClubId[club.id]?.role ?? null,
+      viewerStatus: membershipsByClubId[club.id]?.status ?? null,
       memberCount: memberCountsByClubId[club.id] ?? 0,
     }));
   }, [filteredClubs, membershipsByClubId, memberCountsByClubId]);

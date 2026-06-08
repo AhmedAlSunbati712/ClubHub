@@ -82,6 +82,7 @@ export default function ClubDetail() {
     return {
       ...club,
       viewerRole: viewerMembership?.role ?? null,
+      viewerStatus: viewerMembership?.status ?? null,
       memberCount,
     };
   }, [club, viewerMembership, memberCount]);

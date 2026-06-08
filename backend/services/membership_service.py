@@ -28,7 +28,7 @@ def get_membership(userId, clubId):
     cursor = connection.cursor(dictionary=True)
     try:
         cursor.execute(
-            "SELECT m.UserID, m.ClubID, u.Name, u.Email, m.Role, m.Status, m.JoinDate FROM Memberships m JOIN Users u ON u.UserID = m.UserID WHERE UserID = %s AND ClubID = %s",
+            "SELECT m.UserID, m.ClubID, u.Name, u.Email, m.Role, m.Status, m.JoinDate FROM Memberships m JOIN Users u ON u.UserID = m.UserID WHERE m.UserID = %s AND m.ClubID = %s",
             [userId, clubId],
         )
         return cursor.fetchone()
@@ -41,7 +41,7 @@ def get_memberships_by_club(clubId):
     connection = get_connection()
     cursor = connection.cursor(dictionary=True)
     try:
-        cursor.execute("SELECT m.UserID, m.ClubID, u.Name, u.Email, m.Role, m.Status, m.JoinDate FROM Memberships m JOIN Users u ON u.UserID = m.UserID WHERE ClubID = %s", [clubId])
+        cursor.execute("SELECT m.UserID, m.ClubID, u.Name, u.Email, m.Role, m.Status, m.JoinDate FROM Memberships m JOIN Users u ON u.UserID = m.UserID WHERE m.ClubID = %s", [clubId])
         return cursor.fetchall()
     finally:
         cursor.close()
@@ -80,6 +80,24 @@ def update_membership(userId, clubId, role=None, status=None):
         cursor.execute(
             f"UPDATE Memberships SET {', '.join(fields)} WHERE UserID = %s AND ClubID = %s",
             params,
+        )
+        connection.commit()
+        return cursor.rowcount
+    except Exception as e:
+        connection.rollback()
+        raise e
+    finally:
+        cursor.close()
+        connection.close()
+
+
+def demote_other_presidents(clubId, exclude_user_id):
+    connection = get_connection()
+    cursor = connection.cursor()
+    try:
+        cursor.execute(
+            "UPDATE Memberships SET Role = %s WHERE ClubID = %s AND Role = %s AND UserID != %s",
+            [ClubRole.OFFICER, clubId, ClubRole.PRESIDENT, exclude_user_id],
         )
         connection.commit()
         return cursor.rowcount

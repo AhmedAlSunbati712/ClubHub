@@ -12,6 +12,7 @@ import ManageClubs from '../ManageClubs/index.jsx';
 import ManageLocations from '../ManageLocations/index.jsx';
 import ManageStudents from '../ManageStudents/index.jsx';
 import AppLayout from '../../components/layout/AppLayout.jsx';
+import RequireAdmin from '../../components/auth/RequireAdmin.jsx';
 import { ROUTES } from '../../constants/routes.js';
 
 export default function App() {
@@ -27,10 +28,12 @@ export default function App() {
           <Route path={ROUTES.CLUB_DETAIL} element={<ClubDetail />} />
           <Route path={ROUTES.MANAGE_CLUB} element={<ManageClub />} />
           <Route path={ROUTES.PROFILE} element={<Profile />} />
-          <Route path={ROUTES.ADMIN} element={<AdminDashboard />} />
-          <Route path={ROUTES.ADMIN_CLUBS} element={<ManageClubs />} />
-          <Route path={ROUTES.ADMIN_LOCATIONS} element={<ManageLocations />} />
-          <Route path={ROUTES.ADMIN_STUDENTS} element={<ManageStudents />} />
+          <Route element={<RequireAdmin />}>
+            <Route path={ROUTES.ADMIN} element={<AdminDashboard />} />
+            <Route path={ROUTES.ADMIN_CLUBS} element={<ManageClubs />} />
+            <Route path={ROUTES.ADMIN_LOCATIONS} element={<ManageLocations />} />
+            <Route path={ROUTES.ADMIN_STUDENTS} element={<ManageStudents />} />
+          </Route>
         </Route>
         <Route path="*" element={<Navigate to={ROUTES.EVENTS} replace />} />
       </Routes>
