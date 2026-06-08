@@ -1,3 +1,7 @@
+// Noah Larbalestier, CS61, Spring 2026
+// officer screen for managing a single club — members, pending applications, and club info
+// used Claude to assist with implementation and debugging
+
 import { useMemo, useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, UserPlus, Trash2, CheckCircle2, XCircle, Inbox, Type, AlignLeft, ChevronDown } from 'lucide-react';

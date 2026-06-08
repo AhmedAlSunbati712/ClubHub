@@ -1,3 +1,7 @@
+// Noah Larbalestier, CS61, Spring 2026
+// admin screen for managing clubs — list, delete, and create clubs
+// used Claude to assist with implementation and debugging
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Type, AlignLeft, ChevronDown } from 'lucide-react';
