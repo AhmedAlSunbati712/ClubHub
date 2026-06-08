@@ -2,6 +2,9 @@
 # routes for /api/clubs/:clubId/memberships, /api/clubs/:clubId/memberships/:userId, and /api/users/:userId/memberships
 # used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 
+# Ahmed Al Sunbati, CS61, Spring 2026
+# Build out the route for getting memberships count
+
 from flask import Blueprint
 from controllers import membership_controller
 from middleware import auth

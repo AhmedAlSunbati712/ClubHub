@@ -1,3 +1,10 @@
+/**
+ * events.ts   Ahmed Al Sunbati
+ * CS61     Spring 26
+ * 
+ * Description: Defines typed TanStack Query hooks for event browsing, club event lists,
+ *              event detail reads, create/update/delete mutations and check-in actions.
+ */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from './axios';
 export { useEventRsvps, useCreateRsvp, useUpdateRsvp, useDeleteRsvp } from './rsvp';

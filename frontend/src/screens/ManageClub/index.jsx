@@ -13,12 +13,15 @@ import {
   useDeleteMembership,
 } from '../../api/membership.ts';
 import { useConfirm } from '../../context/ConfirmContext.jsx';
+import { useAuth } from '../../context/AuthContext.jsx';
 import Avatar from '../../components/common/Avatar.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
 import RoleBadge from '../../components/common/RoleBadge.jsx';
 import Button from '../../components/common/Button.jsx';
 import Modal from '../../components/common/Modal.jsx';
 import { formatDate } from '../../utils/format.js';
+
+const CLUB_ROLES = ['Member', 'Officer', 'President'];
 
 const CLUB_CATEGORIES = [
   'Academic',
@@ -39,7 +42,10 @@ export default function ManageClub() {
   const { clubId } = useParams();
   const navigate = useNavigate();
   const confirm = useConfirm();
+  const { user } = useAuth();
   const [tab, setTab] = useState('members');
+  // bumped to remount the role <select> back to server truth on cancel/error
+  const [roleVersion, setRoleVersion] = useState(0);
   const [editOpen, setEditOpen] = useState(false);
   const [editForm, setEditForm] = useState({ name: '', category: '', description: '' });
   const [editErrors, setEditErrors] = useState({});
@@ -66,6 +72,20 @@ export default function ManageClub() {
     () => (memberships ?? []).filter((membership) => membership.status === 'Pending'),
     [memberships],
   );
+
+  // role-change permissions: admins assign any role; the club president assigns
+  // officer/member; officers can't change roles (read-only badge for them).
+  const isPlatformAdmin = user?.role === 'Admin';
+  const isClubPresident = useMemo(
+    () => (memberships ?? []).some((m) => String(m.userId) === String(user?.id) && m.role === 'President'),
+    [memberships, user?.id],
+  );
+  const canChangeRoles = isPlatformAdmin || isClubPresident;
+
+  const roleOptionsFor = (currentRole) => {
+    const allowed = isPlatformAdmin ? CLUB_ROLES : ['Member', 'Officer'];
+    return allowed.includes(currentRole) ? allowed : [currentRole, ...allowed];
+  };
 
   useEffect(() => {
     if (club && editOpen) {
@@ -108,6 +128,31 @@ export default function ManageClub() {
       {
         onSuccess: () => toast.success(`Approved ${applicant.name || 'the applicant'}`),
         onError: (error) => toast.error(errorMessage(error, 'Failed to approve application')),
+      },
+    );
+  };
+
+  const handleRoleChange = async (member, role) => {
+    if (role === member.role) return;
+    if (role === 'President') {
+      const ok = await confirm({
+        title: 'Make president?',
+        message: `${member.name || 'This member'} will become president of ${club?.name ?? 'this club'}. The current president, if any, will be demoted to officer.`,
+        confirmLabel: 'Make President',
+      });
+      if (!ok) {
+        setRoleVersion((v) => v + 1);
+        return;
+      }
+    }
+    updateMembership(
+      { clubId, userId: member.userId, payload: { role } },
+      {
+        onSuccess: () => toast.success(`${member.name || 'Member'} is now ${role.toLowerCase()}`),
+        onError: (error) => {
+          setRoleVersion((v) => v + 1);
+          toast.error(errorMessage(error, 'Failed to update role'));
+        },
       },
     );
   };
@@ -247,7 +292,23 @@ export default function ManageClub() {
                         </td>
                         <td className="muted">{m.email}</td>
                         <td>
-                          <RoleBadge role={m.role} />
+                          {canChangeRoles ? (
+                            <select
+                              key={`${m.userId}-${m.role}-${roleVersion}`}
+                              className="role-select"
+                              value={m.role}
+                              onChange={(e) => handleRoleChange(m, e.target.value)}
+                              aria-label={`Change role for ${m.name}`}
+                            >
+                              {roleOptionsFor(m.role).map((r) => (
+                                <option key={r} value={r}>
+                                  {r}
+                                </option>
+                              ))}
+                            </select>
+                          ) : (
+                            <RoleBadge role={m.role} />
+                          )}
                         </td>
                         <td className="tnum">{formatDate(m.joinDate)}</td>
                         <td className="col-actions">

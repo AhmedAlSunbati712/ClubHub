@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { Users, Mail, Lock, User, Eye, EyeOff, ArrowRight } from 'lucide-react';
 import { toast } from 'react-toastify';
 import Button from '../../components/common/Button.jsx';
@@ -11,7 +11,7 @@ import { useAuth } from '../../context/AuthContext.jsx';
 
 export default function Auth() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, user, isLoading } = useAuth();
   const [mode, setMode] = useState('login'); // 'login' | 'signup'
   const [showPw, setShowPw] = useState(false);
   const [form, setForm] = useState({
@@ -69,6 +69,14 @@ export default function Auth() {
       },
     );
   };
+
+  if (isLoading) {
+    return null;
+  }
+
+  if (user) {
+    return <Navigate to={ROUTES.EVENTS} replace />;
+  }
 
   return (
     <div className="auth">
@@ -206,18 +214,6 @@ export default function Auth() {
               <ArrowRight size={16} />
             </Button>
           </form>
-
-          <div className="auth__divider">
-            <span>or</span>
-          </div>
-
-          <button
-            type="button"
-            className="btn btn-secondary btn-block"
-            onClick={() => toast.info('Dartmouth NetID SSO coming soon')}
-          >
-            Continue with Dartmouth NetID
-          </button>
 
           <p className="auth__foot">
             {isLogin ? "Don't have an account? " : 'Already have an account? '}

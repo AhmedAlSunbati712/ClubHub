@@ -1,3 +1,10 @@
+/**
+ * rsvp.ts   Ahmed Al Sunbati
+ * CS61     Spring 26
+ * 
+ * Description: Defines typed TanStack Query hooks for RSVP reads and RSVP create/update/delete
+ *              mutations including waitlist handling and query invalidation.
+ */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from './axios';
 

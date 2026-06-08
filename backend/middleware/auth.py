@@ -23,6 +23,11 @@ def require_auth(admin_only: bool = False):
             except Exception:
                 return jsonify({"Error": "Invalid or expired token"}), 401
 
+            user = auth_service.get_user_by_id(payload.get("sub"))
+            if not user:
+                return jsonify({"Error": "User no longer exists"}), 401
+            payload["role"] = user["Role"]
+
             if admin_only and payload.get("role") != UserRole.ADMIN:
                 return jsonify({"Error": "Admin access required for this action"}), 403
 

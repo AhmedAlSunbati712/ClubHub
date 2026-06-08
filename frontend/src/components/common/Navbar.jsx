@@ -1,20 +1,21 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { CalendarDays, Users, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.jsx';
+import { isAdmin } from '../../utils/auth.js';
 import Avatar from './Avatar.jsx';
 import RoleBadge from './RoleBadge.jsx';
 import { ROUTES } from '../../constants/routes.js';
-
-const TABS = [
-  { to: ROUTES.EVENTS, label: 'Events', icon: CalendarDays },
-  { to: ROUTES.CLUBS, label: 'Clubs', icon: Users },
-  { to: ROUTES.ADMIN, label: 'Admin', icon: ShieldCheck },
-];
 
 // DartClubs logo + Events/Clubs/Admin tabs + user badge.
 export default function Navbar() {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
+
+  const tabs = [
+    { to: ROUTES.EVENTS, label: 'Events', icon: CalendarDays },
+    { to: ROUTES.CLUBS, label: 'Clubs', icon: Users },
+    ...(isAdmin(user) ? [{ to: ROUTES.ADMIN, label: 'Admin', icon: ShieldCheck }] : []),
+  ];
 
   return (
     <nav className="navbar">
@@ -27,7 +28,7 @@ export default function Navbar() {
         </Link>
 
         <ul className="navbar__tabs">
-          {TABS.map(({ to, label, icon: Icon }) => (
+          {tabs.map(({ to, label, icon: Icon }) => (
             <li key={to}>
               <NavLink
                 to={to}
@@ -69,7 +70,7 @@ export default function Navbar() {
 
       {/* mobile bottom tab bar */}
       <div className="navbar__bottom">
-        {TABS.map(({ to, label, icon: Icon }) => (
+        {tabs.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}

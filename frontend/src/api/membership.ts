@@ -1,3 +1,10 @@
+/**
+ * membership.ts   Ahmed Al Sunbati
+ * CS61     Spring 26
+ * 
+ * Description: Defines typed TanStack Query hooks for club membership reads, membership
+ *              counts and create/update/delete mutations for club membership management.
+ */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from './axios';
 

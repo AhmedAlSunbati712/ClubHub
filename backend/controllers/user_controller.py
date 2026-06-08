@@ -1,3 +1,10 @@
+"""
+user_controller.py     Ahmed Al Sunbati
+CS61, Spring 2026
+
+Description: Defines controllers that handle requests from clients for user creation + mutation and fulfilling
+             queries.
+"""
 from flask import g, request, jsonify
 from pydantic import ValidationError
 from schemas import CreateUserSchema, UpdateUserSchema

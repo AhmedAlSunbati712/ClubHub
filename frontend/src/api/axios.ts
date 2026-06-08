@@ -1,3 +1,9 @@
+/**
+ * axios.ts   Ahmed Al Sunbati
+ * CS61     Spring 26
+ * 
+ * Description: Defines a custom axios object, with an api interceptor that attaches bearer token on each request if available
+ */
 import axios from "axios";
 import { SERVER_URL } from "../constants/server_url";
 

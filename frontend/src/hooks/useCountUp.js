@@ -1,27 +1,33 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 
-const prefersReduced =
-  typeof window !== 'undefined' &&
-  window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-
-// Animates a number from 0 to `value` once on mount.
-export function useCountUp(value, duration = 900) {
-  const [display, setDisplay] = useState(prefersReduced ? value : 0);
-  const raf = useRef(null);
+// Smoothly animates a number from 0 to the target value.
+export function useCountUp(targetValue = 0, duration = 700) {
+  const [value, setValue] = useState(0);
 
   useEffect(() => {
-    // reduced-motion: initial state already equals `value`, nothing to animate
-    if (prefersReduced) return;
-    const start = performance.now();
-    const tick = (now) => {
-      const t = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - t, 3); // easeOutCubic
-      setDisplay(Math.round(eased * value));
-      if (t < 1) raf.current = requestAnimationFrame(tick);
-    };
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [value, duration]);
+    let frameId = 0;
+    let startTime = 0;
+    const safeDuration = Math.max(0, duration);
 
-  return display;
+    const step = (timestamp) => {
+      if (!startTime) startTime = timestamp;
+      const elapsed = timestamp - startTime;
+      const progress = safeDuration === 0 ? 1 : Math.min(elapsed / safeDuration, 1);
+      const nextValue = Math.round(targetValue * progress);
+      setValue(nextValue);
+
+      if (progress < 1) {
+        frameId = window.requestAnimationFrame(step);
+      }
+    };
+
+    setValue(0);
+    frameId = window.requestAnimationFrame(step);
+
+    return () => {
+      window.cancelAnimationFrame(frameId);
+    };
+  }, [targetValue, duration]);
+
+  return value;
 }

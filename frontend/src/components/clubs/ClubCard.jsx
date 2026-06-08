@@ -8,7 +8,9 @@ import { ROUTES } from '../../constants/routes.js';
 export default function ClubCard({ club, onApply }) {
   if (!club) return null;
   const canManage = club.viewerRole === 'Officer' || club.viewerRole === 'President';
-  const isMember = Boolean(club.viewerRole);
+  const isPending = club.viewerStatus === 'Pending';
+  const isActiveMember = Boolean(club.viewerRole) && club.viewerStatus === 'Active';
+  const hasMembership = Boolean(club.viewerRole);
 
   return (
     <article className="card card-interactive club-card">
@@ -21,7 +23,8 @@ export default function ClubCard({ club, onApply }) {
             <Link to={ROUTES.CLUB_DETAIL.replace(':clubId', club.id)}>{club.name}</Link>
           </h3>
           <div className="club-card__badges">
-            {club.viewerRole && <RoleBadge role={club.viewerRole} />}
+            {isActiveMember && <RoleBadge role={club.viewerRole} />}
+            {isPending && <span className="pill">Pending</span>}
             <span className="pill pill-category">{club.category}</span>
           </div>
         </div>
@@ -46,10 +49,16 @@ export default function ClubCard({ club, onApply }) {
             Manage
           </Link>
         )}
-        {!isMember && (
-          <Button className="btn-block" onClick={() => onApply?.(club.id)}>
-            Apply to Join
+        {isPending ? (
+          <Button className="btn-block" disabled>
+            Application Pending
           </Button>
+        ) : (
+          !hasMembership && (
+            <Button className="btn-block" onClick={() => onApply?.(club.id)}>
+              Apply to Join
+            </Button>
+          )
         )}
       </div>
     </article>

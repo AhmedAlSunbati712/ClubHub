@@ -1,3 +1,9 @@
+"""
+users.py     Ahmed Al Sunbati
+CS61, Spring 2026
+
+Description: Defines endpoints for the users resource api that clients can use to communicate with teh backend
+"""
 from flask import Blueprint
 from controllers import user_controller
 from middleware import auth
