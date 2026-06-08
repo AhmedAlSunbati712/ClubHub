@@ -21,6 +21,7 @@ import ManageClubs from '../ManageClubs/index.jsx';
 import ManageLocations from '../ManageLocations/index.jsx';
 import ManageStudents from '../ManageStudents/index.jsx';
 import AppLayout from '../../components/layout/AppLayout.jsx';
+import RequireAuth from '../../components/auth/RequireAuth.jsx';
 import RequireAdmin from '../../components/auth/RequireAdmin.jsx';
 import { ROUTES } from '../../constants/routes.js';
 
@@ -30,21 +31,23 @@ export default function App() {
       <ToastContainer />
       <Routes>
         <Route path={ROUTES.LOGIN} element={<Auth />} />
-        <Route path={ROUTES.HOME} element={<AppLayout />}>
-          <Route index element={<Navigate to={ROUTES.EVENTS} replace />} />
-          <Route path={ROUTES.EVENTS} element={<Events />} />
-          <Route path={ROUTES.CLUBS} element={<Clubs />} />
-          <Route path={ROUTES.CLUB_DETAIL} element={<ClubDetail />} />
-          <Route path={ROUTES.MANAGE_CLUB} element={<ManageClub />} />
-          <Route path={ROUTES.PROFILE} element={<Profile />} />
-          <Route element={<RequireAdmin />}>
-            <Route path={ROUTES.ADMIN} element={<AdminDashboard />} />
-            <Route path={ROUTES.ADMIN_CLUBS} element={<ManageClubs />} />
-            <Route path={ROUTES.ADMIN_LOCATIONS} element={<ManageLocations />} />
-            <Route path={ROUTES.ADMIN_STUDENTS} element={<ManageStudents />} />
+        <Route element={<RequireAuth />}>
+          <Route path={ROUTES.HOME} element={<AppLayout />}>
+            <Route index element={<Navigate to={ROUTES.EVENTS} replace />} />
+            <Route path={ROUTES.EVENTS} element={<Events />} />
+            <Route path={ROUTES.CLUBS} element={<Clubs />} />
+            <Route path={ROUTES.CLUB_DETAIL} element={<ClubDetail />} />
+            <Route path={ROUTES.MANAGE_CLUB} element={<ManageClub />} />
+            <Route path={ROUTES.PROFILE} element={<Profile />} />
+            <Route element={<RequireAdmin />}>
+              <Route path={ROUTES.ADMIN} element={<AdminDashboard />} />
+              <Route path={ROUTES.ADMIN_CLUBS} element={<ManageClubs />} />
+              <Route path={ROUTES.ADMIN_LOCATIONS} element={<ManageLocations />} />
+              <Route path={ROUTES.ADMIN_STUDENTS} element={<ManageStudents />} />
+            </Route>
           </Route>
         </Route>
-        <Route path="*" element={<Navigate to={ROUTES.EVENTS} replace />} />
+        <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
       </Routes>
     </div>
   );
