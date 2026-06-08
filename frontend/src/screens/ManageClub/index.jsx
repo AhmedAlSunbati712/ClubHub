@@ -37,7 +37,6 @@ const CLUB_CATEGORIES = [
   'Other',
 ];
 
-// Images 9, 10, 11 — tabbed: Members / Pending / Settings.
 export default function ManageClub() {
   const { clubId } = useParams();
   const navigate = useNavigate();
