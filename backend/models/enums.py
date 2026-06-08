@@ -1,3 +1,9 @@
+"""
+app.py     Ahmed Al Sunbati
+CS61, Spring 2026
+
+Description: Defines enums used in the DB to reference with the class instead of using strings.
+"""
 from enum import Enum
 
 

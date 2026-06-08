@@ -1,5 +1,12 @@
+/**
+ * auth.ts   Ahmed Al Sunbati
+ * CS61     Spring 26
+ * 
+ * Description: Defines api methods to facilitate user log in and getting information about current signed in-user
+ */
 import axios from "./axios";
 import { UserRole } from "../types/user";
+
 
 type LoginDTO = {
   email: string;

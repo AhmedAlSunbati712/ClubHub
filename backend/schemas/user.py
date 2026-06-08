@@ -1,3 +1,9 @@
+"""
+user.py     Ahmed Al Sunbati
+CS61, Spring 2026
+
+Description: Defines schemas to validate bodys of put and post requests on the users resource.
+"""
 from pydantic import BaseModel, EmailStr, field_validator
 from typing import Optional
 from models.enums import UserRole

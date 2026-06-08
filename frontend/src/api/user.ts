@@ -1,3 +1,10 @@
+/**
+ * user.ts   Ahmed Al Sunbati
+ * CS61     Spring 26
+ * 
+ * Description: Defines typed TanStack Query hooks for user profile reads, user RSVPs
+ *              and user create/update/delete mutations.
+ */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import api from './axios';
 import { UserRole } from '../types/user';

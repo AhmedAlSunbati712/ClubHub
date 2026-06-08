@@ -1,3 +1,11 @@
+/**
+ * admin.ts   Ahmed Al Sunbati
+ * CS61     Spring 26
+ * 
+ * Description: Defines tanstack api hook to grab admin page stats. Top clubs, upcoming events, and stats on the number of clubs
+ *              events, students and memberships.
+ */
+
 import { useQuery } from '@tanstack/react-query';
 import api from './axios';
 

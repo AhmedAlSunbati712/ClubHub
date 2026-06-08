@@ -1,3 +1,10 @@
+/**
+ * locations.ts   Ahmed Al Sunbati
+ * CS61     Spring 26
+ * 
+ * Description: Defines typed TanStack Query hooks for location browsing, single-location
+ *              lookups and create/update/delete mutations for admin location management.
+ */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from './axios';
 

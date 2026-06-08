@@ -2,6 +2,9 @@
 # routes for /api/clubs and /api/clubs/:clubId
 # used Claude to test and find service bugs, then tested bugs in Postman to pinpoint fixes
 
+# Ahmed Al Sunbati, CS61, Spring 2026
+# Built out the route for getting club officers.
+
 from flask import Blueprint
 from controllers import club_controller
 from middleware import auth

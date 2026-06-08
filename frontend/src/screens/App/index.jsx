@@ -1,3 +1,12 @@
+/**
+ * App/index.jsx    Ahmed Al Sunbati
+ * CS61       Spring 26
+ * Description: Defines application routes and matches them to the corresponding screens using react router.
+ * 
+ * 
+ * AI-Usage citation: We used figma make to design the UI layouts and then we used figma mcp to implement the interface
+ *                    but not the wiring for the backend data. That was implemented separately.
+ */
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 

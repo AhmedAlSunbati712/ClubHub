@@ -1,3 +1,10 @@
+"""
+user_controller.py     Ahmed Al Sunbati
+CS61, Spring 2026
+
+Description: Defines services functions to handle business logic for requests coming from the client. Handles querying
+             the database and mutating it according to client requests.
+"""
 from config import get_connection
 from .auth_service import hash_password
 

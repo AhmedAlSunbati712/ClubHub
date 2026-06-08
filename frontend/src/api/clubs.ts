@@ -1,3 +1,10 @@
+/**
+ * clubs.ts   Ahmed Al Sunbati
+ * CS61     Spring 26
+ * 
+ * Description: Defines typed TanStack Query hooks for club browsing, club detail lookups,
+ *              officer lists and club create/update/delete mutations.
+ */
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import api from './axios';
 

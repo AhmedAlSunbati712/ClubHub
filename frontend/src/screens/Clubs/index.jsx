@@ -15,7 +15,7 @@ import { ROUTES } from '../../constants/routes.js';
 import SearchBar from '../../components/common/SearchBar.jsx';
 import ClubCard from '../../components/clubs/ClubCard.jsx';
 import EmptyState from '../../components/common/EmptyState.jsx';
-import { clubCategories } from '../../data/fixtures.js';
+import { clubCategories } from '../../constants/clubCategories.js';
 
 export default function Clubs() {
   const navigate = useNavigate();
